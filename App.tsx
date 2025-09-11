@@ -1,12 +1,20 @@
-import { Text, View } from 'react-native';
 import "./global.css";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SplashScreen from './src/screens/Splash';
+import { NavigationContainer } from "@react-navigation/native";
 
+type rootStackParamList = {
+  Splash: undefined;
+};
+
+
+const Stack = createNativeStackNavigator<rootStackParamList>();
 export default function App() {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-blue-500">
-        Welcome to Nativewind!
-      </Text>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
