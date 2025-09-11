@@ -2,13 +2,14 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, Text, View } from "react-native";
 import { StyleSheet } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 
 export default function SplashScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar hidden={true} />
-            <Image source={require("../assets/logo.png")} style={{ width: 220, height: 220 }} />
+            <Animated.Image source={require("../assets/logo.png")} style={{ width: 220, height: 220 }} entering={FadeIn.duration(1000)} />
 
             <View style={styles.bottomContainer}>
                 <Text style={styles.companyName}>Powered By: {process.env.EXPO_PUBLIC_APP_OWNER}</Text>
