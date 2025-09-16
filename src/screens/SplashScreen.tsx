@@ -13,7 +13,6 @@ import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { runOnJS, scheduleOnRN } from "react-native-worklets";
 
 type NavigationProp = NativeStackNavigationProp<
     RootStackParamList,
@@ -27,6 +26,7 @@ export default function SplashScreen() {
     const opacity = useSharedValue(1);
 
     useEffect(() => {
+        //logo boom
         scale.value = withRepeat(
             withSequence(
                 withTiming(1.1, { duration: 1200 }),
@@ -36,6 +36,7 @@ export default function SplashScreen() {
             true
         );
 
+        //fadeout
         const timer = setTimeout(() => {
             opacity.value = withTiming(0, { duration: 500 });
             setTimeout(() => {
@@ -60,7 +61,7 @@ export default function SplashScreen() {
     return (
         <SafeAreaView className="flex-1 bg-white">
             <StatusBar hidden={true} />
-            
+
             <Animated.View
                 className="flex-1 items-center justify-center w-full h-full"
                 style={fadeOutStyle}
