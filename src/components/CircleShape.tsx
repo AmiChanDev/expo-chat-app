@@ -1,7 +1,7 @@
-import React from 'react';
-import { View } from 'react-native';
+import React from "react";
+import { View } from "react-native";
 
-type Circle = {
+type CircleProps = {
     width: number;
     height: number;
     borderRadius: number;
@@ -12,25 +12,20 @@ type Circle = {
     right?: number;
 };
 
-export default function CirculeShape(props: Circle) {
+export default function CircleShape(props: CircleProps) {
     return (
         <View
             style={{
-                borderRadius: props.borderRadius,
-                height: props.height,
-                width: props.width,
-                backgroundColor: props.fillColor,
-                top: props.top,
-                bottom: props.bottom,
-                left: props.left,
-                right: props.right,
                 position: "absolute",
+                width: props.width,
+                height: props.height,
+                borderRadius: props.borderRadius,
+                backgroundColor: props.fillColor,
                 ...(props.top !== undefined && { top: props.top }),
                 ...(props.bottom !== undefined && { bottom: props.bottom }),
                 ...(props.left !== undefined && { left: props.left }),
                 ...(props.right !== undefined && { right: props.right }),
             }}
-        >
-        </View>
+        />
     );
 }
