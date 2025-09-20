@@ -10,6 +10,7 @@ import SignUpScreen from "./src/screens/SignUpScreen";
 import SettingScreen from "./src/screens/SettingScreen";
 
 import { NavigationContainer } from "@react-navigation/native";
+import { ThemeProvider } from "./src/theme/themeProvider";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -24,15 +25,17 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
