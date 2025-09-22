@@ -59,7 +59,7 @@ export default function SplashScreen() {
     });
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-white dark:bg-black">
             <StatusBar hidden={true} />
 
             <Animated.View
