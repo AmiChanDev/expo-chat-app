@@ -17,11 +17,10 @@ import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 
-// Fixed type for navigation
-type ContactProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
+type ContacScreentProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
 export default function ContactScreen() {
-    const navigation = useNavigation<ContactProps>();
+    const navigation = useNavigation<ContacScreentProps>();
     const [show, setShow] = useState(false);
     const [countryCode, setCountryCode] = useState<CountryCode>("LK");
     const [country, setCountry] = useState<Country | null>(null);

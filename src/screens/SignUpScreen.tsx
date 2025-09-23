@@ -4,9 +4,15 @@ import { AlertNotificationRoot } from "react-native-alert-notification";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import React, { useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../App";
+import { useNavigation } from "@react-navigation/native";
+
+type SignUpScreenProps = NativeStackNavigationProp<RootStackParamList, "SignUpScreen">;
 
 export default function SignUpScreen() {
     const [isPressed, setIsPressed] = useState(false);
+    const navigation = useNavigation<SignUpScreenProps>();
 
     return (
         <AlertNotificationRoot>
@@ -64,7 +70,7 @@ export default function SignUpScreen() {
                             {/* Button */}
                             <TouchableOpacity
                                 className={`w-full rounded-lg py-3 items-center ${isPressed ? "bg-blue-700" : "bg-blue-600"}`}
-                                onPress={() => { Alert.alert("OK"); }}
+                                onPress={() => { navigation.replace("ContactScreen") }}
                                 activeOpacity={1}
                                 onPressIn={() => setIsPressed(true)}
                                 onPressOut={() => setIsPressed(false)}
