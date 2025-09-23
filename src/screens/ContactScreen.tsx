@@ -1,187 +1,132 @@
-import { StatusBar } from "expo-status-bar";
-import { Image, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View, ScrollView } from "react-native";
+import "../../global.css";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import {
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    StatusBar,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 import { useState } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import CountryPicker, { Country, CountryCode } from "react-native-country-picker-modal";
 import { RootStackParamList } from "../../App";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 
-import CountryPicker, { Country, CountryCode, Flag } from "react-native-country-picker-modal";
-
-type ContactScreenProps = NativeStackNavigationProp<RootStackParamList, 'ContactScreen'>;
-
+// Fixed type for navigation
+type ContactProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
 export default function ContactScreen() {
-    const [showCountryPicker, setShowCountryPicker] = useState(false);
+    const navigation = useNavigation<ContactProps>();
+    const [show, setShow] = useState(false);
     const [countryCode, setCountryCode] = useState<CountryCode>("LK");
     const [country, setCountry] = useState<Country | null>(null);
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [isNextEnabled, setIsNextEnabled] = useState(false);
-
-    const navigation = useNavigation<ContactScreenProps>();
-
-    const handlePhoneChange = (text: string) => {
-        setPhoneNumber(text);
-        setIsNextEnabled(text.length >= 9 && /^\d+$/.test(text));
-    };
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+        <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
             <StatusBar hidden={true} />
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'android' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'android' ? 100 : 100}
+                className="flex-1 justify-between"
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 100}
             >
-                <View className="flex-1 justify-between px-6 py-4">
-                    {/* Top Section */}
-                    <View>
-                        {/* Header */}
-                        <View className="flex-row items-center justify-between mb-8">
-                            <Text className="text-xl font-semibold text-gray-800 dark:text-white">Phone Number</Text>
-                            <View className="w-6" />
-                        </View>
+                {/* Header Section */}
+                <View className="flex-1 justify-center items-center px-8">
+                    {/* Logo Container */}
+                    <View className="mb-8">
+                        <Image
+                            source={require("../assets/contact.png")}
+                            className="w-32 h-36"
+                            resizeMode="contain"
+                        />
+                    </View>
 
-                        {/* Illustration */}
-                        <View className="items-center mb-8">
-                            <Image
-                                source={require("../assets/contact.png")}
-                                className="w-48 h-48 mt-3"
-                            />
-                        </View>
-
-                        {/* Title & Description */}
-                        <View className="mb-8">
-                            <Text className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
-                                Add your phone number
-                            </Text>
-                            <Text className="text-gray-600 dark:text-gray-300 text-center text-base leading-relaxed">
-                                We'll send you a verification code to confirm your number.
-                                Your phone number will be private.
-                            </Text>
-                        </View>
-
-                        {/* Phone Input */}
-                        <View className="mb-8 mt-4">
-                            {/* Country Code Selector */}
-                            <Pressable
-                                className="flex-row items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-2 border border-gray-200 dark:border-gray-700"
-                                onPress={() => setShowCountryPicker(true)}
-                            >
-                                <View className="flex-row items-center">
-                                    <AntDesign name="global" size={20} color="#6B7280" style={{ marginRight: 8 }} />
-                                    <Text className="text-gray-700 dark:text-gray-300 font-medium">{countryCode}</Text>
-                                </View>
-                                <AntDesign name="caret-down" size={18} color="#6B7280" />
-                            </Pressable>
-
-                            <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 flex-row items-center">
-                                {/* Flag / Globe Icon */}
-                                <Pressable onPress={() => setShowCountryPicker(true)} className="flex-row items-center mr-3">
-                                    {countryCode ? (
-                                        <Flag countryCode={countryCode} flagSize={20} />
-                                    ) : (
-                                        <AntDesign name="global" size={20} color="#6B7280" />
-                                    )}
-                                    <Text className="ml-2 text-lg text-gray-900 dark:text-white">
-                                        {country?.callingCode ? `+${country.callingCode[0]}` : "+94"}
-                                    </Text>
-                                </Pressable>
-
-                                {/* Phone Number Input */}
-                                <TextInput
-                                    placeholder="Enter phone number"
-                                    placeholderTextColor="#9CA3AF"
-                                    keyboardType="phone-pad"
-                                    className="flex-1 text-lg text-gray-900 dark:text-white"
-                                    value={phoneNumber}
-                                    onChangeText={handlePhoneChange}
-                                    maxLength={10}
-                                    style={{ color: "#111827", backgroundColor: "transparent", paddingVertical: 0 }}
-                                    returnKeyType="done"
-                                />
-                            </View>
-
-                            {/* Validation message */}
-                            {phoneNumber.length > 0 && (
-                                <Text
-                                    className={`text-sm mt-2 ${phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
-                                        ? "text-green-600 dark:text-green-400"
-                                        : "text-red-600 dark:text-red-400"
-                                        }`}
-                                >
-                                    {phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
-                                        ? "✓ Valid number"
-                                        : `Enter ${Math.max(0, 10 - phoneNumber.length)} more digits`}
-                                </Text>
-                            )}
-
-                        </View>
-
-                        {/* Privacy Info */}
-                        <View className="px-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl mb-6">
-                            <View className="flex-row items-start">
-                                <AntDesign name="shake" size={16} color="#3B82F6" style={{ marginRight: 8, marginTop: 2 }} />
-                                <Text className="text-sm text-gray-700 dark:text-gray-300 flex-1">
-                                    Your phone number is private and only used for verification.
-                                    We never share it with other users.
-                                </Text>
-                            </View>
-                        </View>
-                        <Text className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 mb-6">
-                            By continuing, you agree to our{' '}
-                            <Text className="text-blue-600">Terms of Service</Text>
+                    {/* Title Section */}
+                    <View className="mb-10 items-center">
+                        <Text className="text-slate-700 font-bold text-xl text-center leading-7">
+                            Verify Your Phone Number
+                        </Text>
+                        <Text className="text-slate-500 text-sm text-center mt-2 px-4">
+                            We'll send you a verification code to confirm your identity
                         </Text>
                     </View>
 
-                    {/* Bottom Action */}
-                    <View className="pb-4">
+                    {/* Country Picker Section */}
+                    <View className="w-full mb-6">
+                        <Text className="text-slate-600 font-semibold mb-3 text-base">
+                            Select Country
+                        </Text>
                         <Pressable
-                            className={`rounded-xl py-4 px-6 ${isNextEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
-                            disabled={!isNextEnabled}
-                            onPress={() => { navigation.replace('AvatarScreen') }}
+                            className="w-full h-14 bg-white border border-slate-200 rounded-xl justify-between items-center flex-row px-4 shadow-sm"
+                            onPress={() => setShow(true)}
                         >
-                            <Text className={`text-center text-white font-semibold text-lg ${isNextEnabled ? 'opacity-100' : 'opacity-50'}`}>
-                                Continue
-                            </Text>
+                            <CountryPicker
+                                countryCode={countryCode}
+                                withFilter
+                                withFlag
+                                withCountryNameButton
+                                visible={show}
+                                onClose={() => setShow(false)}
+                                onSelect={(country) => {
+                                    setCountryCode(country.cca2);
+                                    setCountry(country);
+                                    setShow(false);
+                                }}
+                            />
+                            <AntDesign name="down" size={16} color="#64748b" />
                         </Pressable>
+
                     </View>
 
-                    {/* Country Picker Modal */}
-                    {showCountryPicker && (
-                        <View className="absolute bg-black/50 justify-end inset-0">
-                            <View className="bg-white dark:bg-gray-900 rounded-t-2xl p-4 max-h-[50%]">
-                                {/* Header */}
-                                <View className="flex-row justify-between items-center mb-4">
-                                    <Text className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Select Country
-                                    </Text>
-                                    <Pressable onPress={() => setShowCountryPicker(false)}>
-                                        <AntDesign name="close" size={24} color="#6B7280" />
-                                    </Pressable>
-                                </View>
+                    {/* Phone Input Section */}
+                    <View className="w-full mb-8">
+                        <Text className="text-slate-600 font-semibold mb-3 text-base">
+                            Phone Number
+                        </Text>
+                        <View className="flex-row gap-3">
+                            {/* Country Code Input */}
+                            <View className="w-20 h-14 bg-white border border-slate-200 rounded-xl justify-center items-center shadow-sm">
+                                <TextInput
+                                    className="text-slate-700 font-medium text-base text-center w-full"
+                                    value={country ? `+${country.callingCode[0]}` : "+94"}
+                                    editable={false}
+                                />
+                            </View>
 
-                                {/* Country Picker */}
-                                <CountryPicker
-                                    countryCode={countryCode}
-                                    withFilter
-                                    withFlag
-                                    withCallingCode
-                                    withEmoji
-                                    onSelect={(selected: Country) => {
-                                        setCountryCode(selected.cca2 as CountryCode);
-                                        setCountry(selected);
-                                        setShowCountryPicker(false);
-                                    }}
-                                    containerButtonStyle={{ alignSelf: "center" }}
+                            {/* Phone Number Input */}
+                            <View className="flex-1 h-14 bg-white border border-slate-200 rounded-xl justify-center shadow-sm">
+                                <TextInput
+                                    className="text-slate-700 font-medium text-base px-4 w-full h-full"
+                                    placeholder="Enter phone number"
+                                    placeholderTextColor="#94a3b8"
+                                    inputMode="tel"
                                 />
                             </View>
                         </View>
-                    )}
+                    </View>
+                </View>
+
+                {/* Bottom Button Section */}
+                <View className="px-8 pb-8">
+                    <Pressable
+                        className="w-full h-14 bg-green-600 justify-center items-center rounded-xl shadow-lg active:bg-green-700"
+                        onPress={() => {
+                            navigation.replace("AvatarScreen");
+                        }}
+                    >
+                        <Text className="text-white font-bold text-lg">Continue</Text>
+                    </Pressable>
+
+                    {/* Terms Text */}
+                    <Text className="text-slate-400 text-xs text-center mt-4 px-4">
+                        By continuing, you agree to our Terms of Service and Privacy Policy
+                    </Text>
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
-
     );
 }
