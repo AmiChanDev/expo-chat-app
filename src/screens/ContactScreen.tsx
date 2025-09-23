@@ -112,7 +112,7 @@ export default function ContactScreen() {
                 {/* Bottom Button Section */}
                 <View className="px-8 pb-8">
                     <Pressable
-                        className="w-full h-14 bg-green-600 justify-center items-center rounded-xl shadow-lg active:bg-green-700"
+                        className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-green-700"
                         onPress={() => {
                             navigation.replace("AvatarScreen");
                         }}
