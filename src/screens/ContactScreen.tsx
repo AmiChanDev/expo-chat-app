@@ -28,30 +28,23 @@ export default function ContactScreen() {
             <StatusBar hidden={true} />
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
+                behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'android' ? 100 : 100}
             >
-                <ScrollView
-                    contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 16 }}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                >
-                    {/* Header */}
-                    <View className="flex-row items-center justify-between mb-8">
-                        <Pressable onPress={() => { /* Navigation back */ }} className="p-2">
-                            <AntDesign name="arrow-left" size={24} color="#1F2937" />
-                        </Pressable>
-                        <Text className="text-xl font-semibold text-gray-800 dark:text-white">Phone Number</Text>
-                        <View className="w-6" />
-                    </View>
+                <View className="flex-1 justify-between px-6 py-4">
+                    {/* Top Section */}
+                    <View>
+                        {/* Header */}
+                        <View className="flex-row items-center justify-between mb-8">
+                            <Text className="text-xl font-semibold text-gray-800 dark:text-white">Phone Number</Text>
+                            <View className="w-6" />
+                        </View>
 
-                    {/* Main Content */}
-                    <View className="flex-1 justify-center">
                         {/* Illustration */}
                         <View className="items-center mb-8">
                             <Image
                                 source={require("../assets/contact.png")}
-                                className="w-48 h-48"
+                                className="w-48 h-48 mt-3"
                             />
                         </View>
 
@@ -92,7 +85,6 @@ export default function ContactScreen() {
                                     maxLength={10}
                                     style={{ color: '#111827', backgroundColor: 'transparent', paddingVertical: 0 }}
                                     returnKeyType="done"
-                                    blurOnSubmit={true}
                                 />
                                 {phoneNumber.length > 0 && (
                                     <Text className={`text-sm mt-2 ${phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
@@ -125,9 +117,22 @@ export default function ContactScreen() {
                         </Text>
                     </View>
 
+                    {/* Bottom Action */}
+                    <View className="pb-4">
+                        <Pressable
+                            className={`rounded-xl py-4 px-6 ${isNextEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+                            disabled={!isNextEnabled}
+                            onPress={() => { navigation.replace('AvatarScreen') }}
+                        >
+                            <Text className={`text-center text-white font-semibold text-lg ${isNextEnabled ? 'opacity-100' : 'opacity-50'}`}>
+                                Continue
+                            </Text>
+                        </Pressable>
+                    </View>
+
                     {/* Country Picker Modal */}
                     {showCountryPicker && (
-                        <View className="absolute bg-black/50 justify-end">
+                        <View className="absolute bg-black/50 justify-end inset-0">
                             <View className="bg-white dark:bg-gray-900 rounded-t-2xl p-4 max-h-[50%]">
                                 <View className="flex-row justify-between items-center mb-4">
                                     <Text className="text-lg font-semibold text-gray-900 dark:text-white">Select Country</Text>
@@ -139,21 +144,9 @@ export default function ContactScreen() {
                             </View>
                         </View>
                     )}
-
-                    {/* Bottom Action */}
-                    <View className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-                        <Pressable
-                            className={`rounded-xl py-4 px-6 ${isNextEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
-                            disabled={!isNextEnabled}
-                            onPress={() => { navigation.replace('AvatarScreen') }}
-                        >
-                            <Text className={`text-center text-white font-semibold text-lg ${isNextEnabled ? 'opacity-100' : 'opacity-50'}`}>
-                                Continue
-                            </Text>
-                        </Pressable>
-                    </View>
-                </ScrollView>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
+
     );
 }
