@@ -7,12 +7,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
 
+import CountryPicker, { Country, CountryCode, Flag } from "react-native-country-picker-modal";
+
 type ContactScreenProps = NativeStackNavigationProp<RootStackParamList, 'ContactScreen'>;
 
 
 export default function ContactScreen() {
     const [showCountryPicker, setShowCountryPicker] = useState(false);
-    const [countryCode, setCountryCode] = useState("+94");
+    const [countryCode, setCountryCode] = useState<CountryCode>("LK");
+    const [country, setCountry] = useState<Country | null>(null);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [isNextEnabled, setIsNextEnabled] = useState(false);
 
@@ -73,32 +76,47 @@ export default function ContactScreen() {
                                 <AntDesign name="caret-down" size={18} color="#6B7280" />
                             </Pressable>
 
-                            {/* Phone Number Input */}
-                            <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <View className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 flex-row items-center">
+                                {/* Flag / Globe Icon */}
+                                <Pressable onPress={() => setShowCountryPicker(true)} className="flex-row items-center mr-3">
+                                    {countryCode ? (
+                                        <Flag countryCode={countryCode} flagSize={20} />
+                                    ) : (
+                                        <AntDesign name="global" size={20} color="#6B7280" />
+                                    )}
+                                    <Text className="ml-2 text-lg text-gray-900 dark:text-white">
+                                        {country?.callingCode ? `+${country.callingCode[0]}` : "+94"}
+                                    </Text>
+                                </Pressable>
+
+                                {/* Phone Number Input */}
                                 <TextInput
                                     placeholder="Enter phone number"
                                     placeholderTextColor="#9CA3AF"
                                     keyboardType="phone-pad"
-                                    className="text-lg text-gray-900 dark:text-white"
+                                    className="flex-1 text-lg text-gray-900 dark:text-white"
                                     value={phoneNumber}
                                     onChangeText={handlePhoneChange}
                                     maxLength={10}
-                                    style={{ color: '#111827', backgroundColor: 'transparent', paddingVertical: 0 }}
+                                    style={{ color: "#111827", backgroundColor: "transparent", paddingVertical: 0 }}
                                     returnKeyType="done"
                                 />
-                                {phoneNumber.length > 0 && (
-                                    <Text className={`text-sm mt-2 ${phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
-                                        ? 'text-green-600 dark:text-green-400'
-                                        : 'text-red-600 dark:text-red-400'
-                                        }`}
-                                    >
-                                        {phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
-                                            ? '✓ Valid number'
-                                            : `Enter ${Math.max(0, 10 - phoneNumber.length)} more digits`
-                                        }
-                                    </Text>
-                                )}
                             </View>
+
+                            {/* Validation message */}
+                            {phoneNumber.length > 0 && (
+                                <Text
+                                    className={`text-sm mt-2 ${phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
+                                        ? "text-green-600 dark:text-green-400"
+                                        : "text-red-600 dark:text-red-400"
+                                        }`}
+                                >
+                                    {phoneNumber.length >= 9 && /^\d+$/.test(phoneNumber)
+                                        ? "✓ Valid number"
+                                        : `Enter ${Math.max(0, 10 - phoneNumber.length)} more digits`}
+                                </Text>
+                            )}
+
                         </View>
 
                         {/* Privacy Info */}
@@ -134,13 +152,30 @@ export default function ContactScreen() {
                     {showCountryPicker && (
                         <View className="absolute bg-black/50 justify-end inset-0">
                             <View className="bg-white dark:bg-gray-900 rounded-t-2xl p-4 max-h-[50%]">
+                                {/* Header */}
                                 <View className="flex-row justify-between items-center mb-4">
-                                    <Text className="text-lg font-semibold text-gray-900 dark:text-white">Select Country</Text>
+                                    <Text className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        Select Country
+                                    </Text>
                                     <Pressable onPress={() => setShowCountryPicker(false)}>
                                         <AntDesign name="close" size={24} color="#6B7280" />
                                     </Pressable>
                                 </View>
-                                <Text className="text-gray-500 text-center">Country selection would go here</Text>
+
+                                {/* Country Picker */}
+                                <CountryPicker
+                                    countryCode={countryCode}
+                                    withFilter
+                                    withFlag
+                                    withCallingCode
+                                    withEmoji
+                                    onSelect={(selected: Country) => {
+                                        setCountryCode(selected.cca2 as CountryCode);
+                                        setCountry(selected);
+                                        setShowCountryPicker(false);
+                                    }}
+                                    containerButtonStyle={{ alignSelf: "center" }}
+                                />
                             </View>
                         </View>
                     )}
