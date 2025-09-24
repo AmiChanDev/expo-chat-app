@@ -1,3 +1,4 @@
+import "./global.css"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //screens

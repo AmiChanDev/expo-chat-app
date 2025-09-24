@@ -3,7 +3,6 @@ import { useColorScheme } from "nativewind";
 import React, { createContext, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { Appearance } from "react-native";
-import { useUserRegistration } from "../components/UserContext";
 
 export type ThemeOption = "light" | "dark" | "system";
 const THEME_KEY = "@app_color_scheme";
