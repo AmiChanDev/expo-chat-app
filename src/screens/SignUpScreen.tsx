@@ -7,13 +7,15 @@ import React, { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
+import { useUserRegistration } from "../components/UserContext";
+import { FloatingLabelInput } from "react-native-floating-label-input";
 
 type SignUpScreenProps = NativeStackNavigationProp<RootStackParamList, "SignUpScreen">;
 
 export default function SignUpScreen() {
     const [isPressed, setIsPressed] = useState(false);
     const navigation = useNavigation<SignUpScreenProps>();
-
+    const { userData, setUserData } = useUserRegistration();
     return (
         <AlertNotificationRoot>
             <KeyboardAvoidingView
@@ -39,21 +41,18 @@ export default function SignUpScreen() {
                         {/* Sign Up Form */}
                         <View className="w-full">
                             <View className="mb-4">
-                                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</Text>
-                                <TextInput
-                                    placeholder="Enter your email"
-                                    placeholderTextColor="#9CA3AF"
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-base text-black dark:text-white"
+                                <FloatingLabelInput
+                                    label="First Name"
+                                    value={userData.firstName}
+                                    onChangeText={(text) => setUserData((previous) => ({ ...previous, firstName: text }))}
                                 />
                             </View>
 
                             <View className="mb-4">
-                                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</Text>
-                                <TextInput
-                                    placeholder="Enter your password"
-                                    placeholderTextColor="#9CA3AF"
-                                    secureTextEntry
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-base text-black dark:text-white"
+                                <FloatingLabelInput
+                                    label="Last Name"
+                                    value={userData.lastName}
+                                    onChangeText={(text) => setUserData((previous) => ({ ...previous, lastName: text }))}
                                 />
                             </View>
 
@@ -70,7 +69,7 @@ export default function SignUpScreen() {
                             {/* Button */}
                             <TouchableOpacity
                                 className={`w-full rounded-lg py-3 items-center ${isPressed ? "bg-blue-700" : "bg-blue-600"}`}
-                                onPress={() => { navigation.replace("ContactScreen") }}
+                                onPress={() => { navigation.replace("HomeScreen") }}
                                 activeOpacity={1}
                                 onPressIn={() => setIsPressed(true)}
                                 onPressOut={() => setIsPressed(false)}

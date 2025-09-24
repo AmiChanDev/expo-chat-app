@@ -21,11 +21,11 @@ export default function AvatarScreen() {
         { id: '6', src: require('../assets/avatars/avatar_6.png') },
     ];
 
-    const [image, setImage] = useState<string | number | null>(null); // allow number for local require()
+    const [image, setImage] = useState<string | number | null>(null);
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ["images"],
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
@@ -97,7 +97,7 @@ export default function AvatarScreen() {
                     <Pressable
                         className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
                         onPress={() => {
-                            navigation.replace("HomeScreen");
+                            navigation.replace("SignUpScreen");
                         }}
                     >
                         <Text className="text-white font-bold text-lg">Create Account</Text>
