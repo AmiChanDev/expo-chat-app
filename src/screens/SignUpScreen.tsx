@@ -56,20 +56,10 @@ export default function SignUpScreen() {
                                 />
                             </View>
 
-                            <View className="mb-6">
-                                <Text className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</Text>
-                                <TextInput
-                                    placeholder="Enter your confirm password"
-                                    placeholderTextColor="#9CA3AF"
-                                    secureTextEntry
-                                    className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-base text-black dark:text-white"
-                                />
-                            </View>
-
                             {/* Button */}
                             <TouchableOpacity
                                 className={`w-full rounded-lg py-3 items-center ${isPressed ? "bg-blue-700" : "bg-blue-600"}`}
-                                onPress={() => { navigation.replace("HomeScreen") }}
+                                onPress={() => { navigation.replace("ContactScreen") }}
                                 activeOpacity={1}
                                 onPressIn={() => setIsPressed(true)}
                                 onPressOut={() => setIsPressed(false)}

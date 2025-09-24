@@ -7,6 +7,7 @@ import { KeyboardAvoidingView, Platform } from "react-native";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { useUserRegistration } from "../components/UserContext";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
@@ -22,6 +23,7 @@ export default function AvatarScreen() {
     ];
 
     const [image, setImage] = useState<string | number | null>(null);
+    const { userData, setUserData } = useUserRegistration();
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -43,6 +45,7 @@ export default function AvatarScreen() {
                 keyboardVerticalOffset={100}
             >
                 <View className="flex-1 justify-center items-center px-8">
+
                     <Text className="text-slate-700 font-bold text-2xl text-center leading-7">
                         Set Up Your Profile
                     </Text>
@@ -97,7 +100,8 @@ export default function AvatarScreen() {
                     <Pressable
                         className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
                         onPress={() => {
-                            navigation.replace("SignUpScreen");
+                            setUserData((previous) => ({ ...previous, avatar: image }));
+                            console.log(userData)
                         }}
                     >
                         <Text className="text-white font-bold text-lg">Create Account</Text>

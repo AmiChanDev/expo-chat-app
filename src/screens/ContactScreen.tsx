@@ -1,4 +1,3 @@
-import "../../global.css";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -16,6 +15,7 @@ import CountryPicker, { Country, CountryCode } from "react-native-country-picker
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { useUserRegistration } from "../components/UserContext";
 
 type ContacScreentProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
@@ -25,6 +25,7 @@ export default function ContactScreen() {
     const [countryCode, setCountryCode] = useState<CountryCode>("LK");
     const [country, setCountry] = useState<Country | null>(null);
 
+    const { userData, setUserData } = useUserRegistration();
     return (
         <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
             <StatusBar hidden={true} />
@@ -74,6 +75,7 @@ export default function ContactScreen() {
                                     setCountryCode(country.cca2);
                                     setCountry(country);
                                     setShow(false);
+                                    setUserData((previous) => ({ ...previous, country: country.name }));
                                 }}
                             />
                             <AntDesign name="down" size={16} color="#64748b" />
