@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { View, Text, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
-import { AlertNotificationRoot } from "react-native-alert-notification";
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import React, { useState } from "react";
@@ -9,13 +9,19 @@ import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
 import { useUserRegistration } from "../components/UserContext";
 import { FloatingLabelInput } from "react-native-floating-label-input";
+import * as Validation from "../util/Validation";
 
 type SignUpScreenProps = NativeStackNavigationProp<RootStackParamList, "SignUpScreen">;
 
 export default function SignUpScreen() {
     const [isPressed, setIsPressed] = useState(false);
     const navigation = useNavigation<SignUpScreenProps>();
+
     const { userData, setUserData } = useUserRegistration();
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+
+
     return (
         <AlertNotificationRoot>
             <KeyboardAvoidingView
@@ -59,10 +65,27 @@ export default function SignUpScreen() {
                             {/* Button */}
                             <TouchableOpacity
                                 className={`w-full rounded-lg py-3 items-center ${isPressed ? "bg-blue-700" : "bg-blue-600"}`}
-                                onPress={() => { navigation.replace("ContactScreen") }}
-                                activeOpacity={1}
-                                onPressIn={() => setIsPressed(true)}
-                                onPressOut={() => setIsPressed(false)}
+                                onPress={() => {
+                                    let validateFirstName = Validation.validateFirstName(userData.firstName);
+                                    let validateLastName = Validation.validateLastName(userData.lastName)
+
+                                    if (validateFirstName) {
+                                        Toast.show({
+                                            type: ALERT_TYPE.WARNING,
+                                            textBody: validateFirstName,
+                                            autoClose: 2000,
+                                        })
+                                    } else if (validateLastName) {
+                                        Toast.show({
+                                            type: ALERT_TYPE.WARNING,
+                                            textBody: validateLastName,
+                                            autoClose: 2000,
+                                        })
+                                    } else {
+                                        navigation.replace  ("ContactScreen");
+                                    }
+
+                                }}
                             >
                                 <Text className="text-white font-semibold text-base">Sign Up</Text>
                             </TouchableOpacity>
