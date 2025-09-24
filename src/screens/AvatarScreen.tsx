@@ -1,12 +1,27 @@
-import { Image, Pressable, StatusBar, Text, View } from "react-native";
+import { FlatList, Image, Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
 import { KeyboardAvoidingView, Platform } from "react-native";
 
+import { RootStackParamList } from "../../App";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+
+type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
+
 export default function AvatarScreen() {
-    const [image, setImage] = useState<string | null>(null);
+    const navigation = useNavigation<AvatarScreenProps>();
+    const avatar = [
+        { id: '1', src: require('../assets/avatars/avatar_1.png') },
+        { id: '2', src: require('../assets/avatars/avatar_2.png') },
+        { id: '3', src: require('../assets/avatars/avatar_3.png') },
+        { id: '4', src: require('../assets/avatars/avatar_4.png') },
+        { id: '5', src: require('../assets/avatars/avatar_5.png') },
+        { id: '6', src: require('../assets/avatars/avatar_6.png') },
+    ];
+
+    const [image, setImage] = useState<string | number | null>(null); // allow number for local require()
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -16,18 +31,17 @@ export default function AvatarScreen() {
             quality: 1,
         });
 
-        if (!result.canceled) setImage(result.assets[0].uri);
+        if (!result.canceled) setImage(result.assets[0].uri); // uri is string
     };
 
     return (
         <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
-            <StatusBar hidden={true} />
+            <StatusBar hidden />
             <KeyboardAvoidingView
                 className="flex-1 justify-between"
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 100}
+                keyboardVerticalOffset={100}
             >
-                {/* Header Section */}
                 <View className="flex-1 justify-center items-center px-8">
                     <Text className="text-slate-700 font-bold text-2xl text-center leading-7">
                         Set Up Your Profile
@@ -36,20 +50,41 @@ export default function AvatarScreen() {
                         Add a profile picture
                     </Text>
 
-                    {/* Profile Picture Picker */}
-                    <Pressable onPress={pickImage} className="mt-10 mb-6">
-                        {image ? (<Image source={{ uri: image }} className="w-[180] h-[180] rounded-full border-hairline" />
-                        ) : (
-                            <View>
-                                <Image source={require("../assets/avatar.png")} className="w-[160] h-[160]" />
-                                <Text className="text-center font-bold text-2xl text-black-600 border-dotted border-green-500 border rounded-full mt-5">
-                                    Add Image
-                                </Text>
-                            </View>
-                        )}
+                    {/* Main profile picture */}
+                    <Pressable onPress={pickImage} className="mt-8 mb-6 items-center">
+                        <Image
+                            source={
+                                image
+                                    ? typeof image === "string"
+                                        ? { uri: image }
+                                        : image
+                                    : require("../assets/avatar.png")
+                            }
+                            className={`rounded-full border-2 ${image ? "w-44 h-44 border-gray-300" : "w-40 h-40 border-gray-300"
+                                }`}
+                        />
                     </Pressable>
 
-                    <Text className="text-slate-700 font-bold text-xl text-center leading-7">
+                    {/* Avatar selection list */}
+                    {!image && (
+                        <FlatList
+                            data={avatar}
+                            renderItem={({ item }) => (
+                                <Pressable onPress={() => setImage(item.src)} className="mx-2">
+                                    <Image
+                                        source={item.src}
+                                        className="w-20 h-20 rounded-full border-2 border-gray-300"
+                                    />
+                                </Pressable>
+                            )}
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 4 }}
+                        />
+                    )}
+
+                    <Text className="text-slate-700 font-bold text-xl text-center leading-7 mt-6">
                         Choose Your Profile Picture
                     </Text>
                     <Text className="text-slate-500 text-sm text-center mt-2 px-4">
@@ -62,13 +97,14 @@ export default function AvatarScreen() {
                     <Pressable
                         className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
                         onPress={() => {
-                            // Navigate to next screen or action
+                            navigation.replace("HomeScreen");
                         }}
                     >
-                        <Text className="text-white font-bold text-lg">Next</Text>
+                        <Text className="text-white font-bold text-lg">Create Account</Text>
                     </Pressable>
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
+
     );
 }
