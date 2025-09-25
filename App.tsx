@@ -14,6 +14,7 @@ import SettingScreen from "./src/screens/SettingScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { ThemeProvider } from "./src/theme/themeProvider";
 import { UserRegistrationProvider } from "./src/components/UserContext";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -30,21 +31,23 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <UserRegistrationProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </UserRegistrationProvider>
-    </ThemeProvider>
+    <AlertNotificationRoot>
+      <ThemeProvider>
+        <UserRegistrationProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </UserRegistrationProvider>
+      </ThemeProvider>
+    </AlertNotificationRoot>
   );
 }
