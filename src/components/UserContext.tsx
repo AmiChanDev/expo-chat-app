@@ -21,7 +21,7 @@ export const UserRegistrationProvider: React.FC<{ children: ReactNode }> = ({ ch
         lastName: "",
         contactNo: "",
         countryCode: "",
-        profileImage: null
+        profileImage: null,
     });
 
     return (
