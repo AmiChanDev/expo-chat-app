@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, FlatList, Image } from "react-
 import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
 
@@ -18,6 +18,7 @@ type ChatType = {
 }
 export default function HomeScreen() {
     const navigation = useNavigation<HomeScreenProps>();
+    const [search, setSearch] = useState("");
     const chats: ChatType[] = [
         {
             id: 1,
@@ -73,13 +74,22 @@ export default function HomeScreen() {
         });
     }, [navigation]);
 
-
+    const filteredChats = chats.filter((chat) =>
+        chat.name.toLowerCase().includes(search.toLowerCase()) ||
+        chat.lastMessage.toLowerCase().includes(search.toLowerCase())
+    );
 
     return (
         <SafeAreaView className="flex-1">
             <View className="items-center flex-row mx-2 bg-gray-300 rounded-full px-6 h-14">
                 <Ionicons name="search" size={20} color="black" />
-                <TextInput className="flex-1 text-black-500 ml-2" placeholder="Search" placeholderTextColor={'black'} />
+                <TextInput
+                    className="flex-1 text-black-500 ml-2"
+                    placeholder="Search"
+                    placeholderTextColor={'black'}
+                    value={search}
+                    onChangeText={setSearch}
+                />
             </View>
 
             <View className="mt-4">
@@ -88,7 +98,7 @@ export default function HomeScreen() {
 
 
             <FlatList
-                data={chats}
+                data={filteredChats}
                 renderItem={({ item }) => (
                     <View className="flex-row items-center p-4 border-b border-gray-200">
                         <Image source={{ uri: item.profile }} className="h-12 w-12 rounded-full" />
