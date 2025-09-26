@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { BottomTabBar } from "@react-navigation/bottom-tabs";
 
 
 type HomeScreenProps = NativeStackNavigationProp<RootStackParamList, "HomeScreen">
@@ -44,7 +45,7 @@ export default function HomeScreen() {
         {
             id: 4,
             name: "David Kim",
-            lastMessage: "Check out this photo!",
+            lastMessage: "Check out this photo! Test message to see how it looks in the chat preview. This is a longer message to test text truncation.",
             time: "12:20 PM",
             profile: "https://avatar.iran.liara.run/public/boy?username=David"
         },
@@ -79,6 +80,32 @@ export default function HomeScreen() {
         chat.lastMessage.toLowerCase().includes(search.toLowerCase())
     );
 
+    const renderItem = ({ item }: { item: ChatType }) => (
+        <View className="flex-row items-center p-4 border-b border-gray-200 bg-white">
+            {/* Avatar */}
+            <Image
+                source={{ uri: item.profile }}
+                className="h-14 w-14 rounded-full border border-gray-300"
+            />
+
+            {/* Name + Message */}
+            <View className="ml-4 flex-1">
+                <View className="flex-row justify-between items-center">
+                    <Text className="font-semibold text-base text-gray-800">{item.name}</Text>
+                    <Text className="text-xs text-gray-500">{item.time}</Text>
+                </View>
+                <Text
+                    className="text-gray-500 mt-1"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                >
+                    {item.lastMessage}
+                </Text>
+            </View>
+        </View>
+
+    );
+
     return (
         <SafeAreaView className="flex-1">
             <View className="items-center flex-row mx-2 bg-gray-300 rounded-full px-6 h-14">
@@ -99,16 +126,7 @@ export default function HomeScreen() {
 
             <FlatList
                 data={filteredChats}
-                renderItem={({ item }) => (
-                    <View className="flex-row items-center p-4 border-b border-gray-200">
-                        <Image source={{ uri: item.profile }} className="h-12 w-12 rounded-full" />
-                        <View className="ml-3 flex-1">
-                            <Text className="font-semibold">{item.name}</Text>
-                            <Text className="text-gray-500">{item.lastMessage}</Text>
-                        </View>
-                        <Text className="text-gray-400">{item.time}</Text>
-                    </View>
-                )}
+                renderItem={renderItem}
                 keyExtractor={item => item.id.toString()}
             />
 
