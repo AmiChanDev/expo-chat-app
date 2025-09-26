@@ -35,9 +35,9 @@ export default function App() {
       <ThemeProvider>
         <UserRegistrationProvider>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+            <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: false }}>
               <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
               <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
               <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
               <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
