@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useUserRegistration } from "../components/UserContext";
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
+import { createNewAccount } from "../api/UserService";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
@@ -62,7 +63,7 @@ export default function AvatarScreen() {
         }));
     };
 
-    const handleCreateAccount = () => {
+    const handleCreateAccount = async () => {
         if (!image) {
             Toast.show({
                 type: ALERT_TYPE.WARNING,
@@ -94,11 +95,11 @@ export default function AvatarScreen() {
             return;
         }
 
-        console.log("Profile setup completed");
-        console.log("User Data:", userData);
+        // console.log("User Data:", userData);
 
-        // Navigate to next screen
-        // navigation.navigate("NextScreen");
+        // API
+        await createNewAccount(userData);
+        console.log("Profile setup completed");
     };
 
     return (
