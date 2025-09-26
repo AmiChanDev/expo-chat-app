@@ -10,7 +10,7 @@ import {
     TextInput,
     View,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CountryPicker, { Country, CountryCode } from "react-native-country-picker-modal";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -29,6 +29,15 @@ export default function ContactScreen() {
     const [country, setCountry] = useState<Country | null>(null);
 
     const { userData, setUserData } = useUserRegistration();
+
+    useEffect(() => {
+        if (!userData.countryCode) {
+            setUserData((prev) => ({
+                ...prev,
+                countryCode: "+94",
+            }));
+        }
+    }, [userData.countryCode, setUserData]);
 
     return (
         <AlertNotificationRoot>
