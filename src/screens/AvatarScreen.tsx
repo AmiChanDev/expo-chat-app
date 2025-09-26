@@ -37,7 +37,7 @@ export default function AvatarScreen() {
         });
 
         if (!result.canceled) {
-            const selectedImage = result.assets[0].uri;
+            const selectedImage = result.assets[0].uri; //idk why starts wtih 16
             setImage(selectedImage);
             setUserData((previous) => ({
                 ...previous,
