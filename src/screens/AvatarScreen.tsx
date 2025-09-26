@@ -1,4 +1,4 @@
-import { FlatList, Image, Pressable, StatusBar, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -15,6 +15,7 @@ type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactS
 
 export default function AvatarScreen() {
     const navigation = useNavigation<AvatarScreenProps>();
+    const [loading, setLoading] = useState(false);
 
     const avatar = [
         { id: '1', src: require('../assets/avatars/avatar_1.png') },
@@ -98,8 +99,47 @@ export default function AvatarScreen() {
         // console.log("User Data:", userData);
 
         // API
-        await createNewAccount(userData);
-        console.log("Profile setup completed");
+        setLoading(true);
+        {
+            loading ? (
+                <View className="w-full h-14 justify-center items-center">
+                    <ActivityIndicator size="large" color="#2563eb" />
+                </View>
+            ) : (
+                <Pressable
+                    className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
+                    onPress={handleCreateAccount}
+                >
+                    <Text className="text-white font-bold text-lg">Create Account</Text>
+                </Pressable>
+            )
+        }
+
+        try {
+            setLoading(true);
+            const response = await createNewAccount(userData);
+            if (response.status) {
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Success",
+                    textBody: response.message
+                })
+                navigation.replace("HomeScreen")
+            } else {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "Warning",
+                    textBody: response.message
+                })
+            }
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            console.log("Profile setup completed");
+            setLoading(false);
+        }
+
     };
 
     return (
@@ -176,7 +216,11 @@ export default function AvatarScreen() {
                             className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
                             onPress={handleCreateAccount}
                         >
-                            <Text className="text-white font-bold text-lg">Create Account</Text>
+                            {loading ? (
+                                <ActivityIndicator size={'large'} color={'red'} />
+                            ) : (
+                                <Text className="text-white font-bold text-lg">Create Account</Text>
+                            )}
                         </Pressable>
                     </View>
                 </KeyboardAvoidingView>
