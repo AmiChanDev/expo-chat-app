@@ -1,13 +1,14 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { View, Text, TouchableOpacity, TextInput, FlatList, Image } from "react-native";
-import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ChatStackParamList } from "./tabs/ChatsScreen";
+import { ChatStackParamList } from "../tabs/ChatsScreen";
+import { RootStackParamList } from "../../../App";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">
+type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>
 type ChatType = {
     id: number,
     name: string,
@@ -18,6 +19,7 @@ type ChatType = {
 }
 export default function HomeScreen() {
     const navigation = useNavigation<HomeScreenProps>();
+    const rootNavigation = useNavigation<RootNavigationProp>();
     const [search, setSearch] = useState("");
     const chats: ChatType[] = [
         {
@@ -62,7 +64,7 @@ export default function HomeScreen() {
             title: "Expo Chat App",
             headerTitleStyle: { fontWeight: "bold" },
             headerRight: () => (
-                <View style={{ flexDirection: "row", gap: 16 }}>
+                <View style={{ flexDirection: "row", gap: 12 }}>
                     <TouchableOpacity style={{ marginRight: 8 }}>
                         <Ionicons name="camera-outline" size={24} color="black" />
                     </TouchableOpacity>
@@ -80,29 +82,38 @@ export default function HomeScreen() {
     );
 
     const renderItem = ({ item }: { item: ChatType }) => (
-        <View className="flex-row items-center p-4 border-b border-gray-200 bg-white">
-            {/* Avatar */}
-            <Image
-                source={{ uri: item.profile }}
-                className="h-14 w-14 rounded-full border border-gray-300"
-            />
+        <TouchableOpacity
+            onPress={() => rootNavigation.navigate("SingleChatScreen", {
+                chatId: item.id,
+                friendName: item.name,
+                lastSeenTime: item.time,
+                profileImage: item.profile
+            })}
+        >
+            <View className="flex-row items-center p-4 border-b border-gray-200 bg-white">
+                {/* Avatar */}
+                <Image
+                    source={{ uri: item.profile }}
+                    className="h-14 w-14 rounded-full border border-gray-300"
+                />
 
-            {/* Name + Message */}
-            <View className="ml-4 flex-1">
-                <View className="flex-row justify-between items-center">
-                    <Text className="font-semibold text-base text-gray-800">{item.name}</Text>
-                    <Text className="text-xs text-gray-500">{item.time}</Text>
+                {/* Name + Message */}
+                <View className="ml-4 flex-1">
+                    <View className="flex-row justify-between items-center">
+                        <Text className="font-semibold text-base text-gray-800">{item.name}</Text>
+                        <Text className="text-xs text-gray-500">{item.time}</Text>
+                    </View>
+                    <Text
+                        className="text-gray-500 mt-1"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {item.lastMessage}
+                    </Text>
                 </View>
-                <Text
-                    className="text-gray-500 mt-1"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                >
-                    {item.lastMessage}
-                </Text>
             </View>
-        </View>
 
+        </TouchableOpacity>
     );
 
     return (
@@ -118,12 +129,8 @@ export default function HomeScreen() {
                 />
             </View>
 
-            <View className="mt-4">
-                <FlatList data={["hello"]} renderItem={() => <View></View>} />
-            </View>
-
-
             <FlatList
+                className="mt-4"
                 data={filteredChats}
                 renderItem={renderItem}
                 keyExtractor={item => item.id.toString()}
@@ -134,6 +141,7 @@ export default function HomeScreen() {
                 <TouchableOpacity
                     className="h-16 w-16 rounded-full justify-center items-center"
                     activeOpacity={1}
+                    onPress={() => navigation.navigate("NewChatScreen")}
                 >
                     <Ionicons name="chatbox-ellipses" size={32} color="black" />
                 </TouchableOpacity>

@@ -1,4 +1,4 @@
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
     FlatList,
     Image,
@@ -19,14 +19,14 @@ import { Ionicons } from "@expo/vector-icons";
 type Message = {
     id: number;
     text: string;
-    sender: "me" | "firend";
+    sender: "me" | "friend";
     time: string;
     status?: "sent" | "delivered" | "read";
 };
 
 const dummyMessage: Message[] = [
-    { id: 1, text: "Hi", sender: "firend", time: "10.56 AM" },
-    { id: 2, text: "HELLO", sender: "firend", time: "10.58 AM" },
+    { id: 1, text: "Hi", sender: "friend", time: "10.56 AM" },
+    { id: 2, text: "HELLO", sender: "friend", time: "10.58 AM" },
     {
         id: 3,
         text: "Hey , kohomada",
@@ -36,17 +36,19 @@ const dummyMessage: Message[] = [
     },
 ];
 
-type SingleChatScreenProps = NativeStackNavigationProp<
+type SingleChatScreenProps = NativeStackScreenProps<
     RootStackParamList,
     "SingleChatScreen"
 >;
 
 export default function SingleChatScreen() {
-    const navigation = useNavigation<SingleChatScreenProps>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "SingleChatScreen">>();
+    const route = useRoute<SingleChatScreenProps['route']>();
+    const { chatId, friendName, profileImage, lastSeenTime } = route.params;
 
     const [message, setMessage] = useState<Message[]>([
-        { id: 1, text: "Hi", sender: "firend", time: "10.56 AM" },
-        { id: 2, text: "HELLO", sender: "firend", time: "10.58 AM" },
+        { id: 1, text: "Hi", sender: "friend", time: "10.56 AM" },
+        { id: 2, text: "HELLO", sender: "friend", time: "10.58 AM" },
         {
             id: 3,
             text: "Hey , kohomada",
@@ -56,6 +58,7 @@ export default function SingleChatScreen() {
         },
     ]);
 
+
     const [input, setInput] = useState("");
 
     useLayoutEffect(() => {
@@ -63,14 +66,20 @@ export default function SingleChatScreen() {
             title: "",
             headerLeft: () => (
                 <View className="flex-row items-center gap-2">
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        className="mr-3"
+                    >
+                        <Ionicons name="arrow-back" size={24} color="black" />
+                    </TouchableOpacity>
                     <Image
-                        source={{ uri: "https://avatar.iran.liara.run/public/boy?username=Alice" }}
+                        source={{ uri: profileImage }}
                         className="h-14 w-14 rounded-full border-2 border-gray-400 p-1"
                     />
                     <View className="space-y-2">
-                        <Text className="font-bold text-2xl">Sahan Perera</Text>
+                        <Text className="font-bold text-2xl">{friendName}</Text>
                         <Text className="italic text-xs font-bold text-gray-500">
-                            Last seen today at 11.00 am
+                            Last seen {lastSeenTime}
                         </Text>
                     </View>
                 </View>
@@ -81,7 +90,7 @@ export default function SingleChatScreen() {
                 </TouchableOpacity>
             ),
         });
-    }, [navigation]);
+    }, [navigation, profileImage, friendName, lastSeenTime]);
 
     const renderItem = ({ item }: { item: Message }) => {
         const isMe = item.sender === "me";

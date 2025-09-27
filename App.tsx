@@ -8,8 +8,8 @@ import ContactScreen from "./src/screens/ContactScreen";
 import AvatarScreen from "./src/screens/AvatarScreen";
 import SignInScreen from "./src/screens/SignInScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
-import SettingScreen from "./src/screens/SettingScreen";
-
+import SettingScreen from "./src/screens/chatTabs/SettingScreen";
+import HomeScreen from "./src/screens/chatTabs/HomeScreen";
 import HomeTabs from "./src/screens/HomeTabs";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -26,12 +26,12 @@ export type RootStackParamList = {
   AvatarScreen: undefined;
   SignInScreen: undefined;
   HomeTabs: undefined;
-
+  HomeScreen: undefined;
   SettingScreen: undefined;
   ProfileScreen: undefined;
   SingleChatScreen: {
     chatId: number;
-    chatName: string;
+    friendName: string;
     lastSeenTime: string;
     profileImage: string;
   };
@@ -53,6 +53,7 @@ export default function App() {
               <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
               <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
               <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
               <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
               <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />
             </Stack.Navigator>
