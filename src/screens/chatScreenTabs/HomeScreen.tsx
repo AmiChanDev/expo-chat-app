@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ChatStackParamList } from "../tabs/ChatsScreen";
+import { ChatStackParamList } from "../HomeScreenTabs/ChatsScreen";
 import { RootStackParamList } from "../../../App";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">

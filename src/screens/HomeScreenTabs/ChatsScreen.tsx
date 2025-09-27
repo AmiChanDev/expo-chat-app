@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HomeScreen from "../chatTabs/HomeScreen";
-import SettingScreen from "../chatTabs/SettingScreen";
-import NewChatScreen from "../chatTabs/NewChatScreen";
+import HomeScreen from "../chatScreenTabs/HomeScreen";
+import SettingScreen from "../chatScreenTabs/SettingScreen";
+import NewChatScreen from "../chatScreenTabs/NewChatScreen";
 
 export type ChatStackParamList = {
   HomeScreen: undefined;

@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import ChatsScreen from "./tabs/ChatsScreen";
-import StatusScreen from "./tabs/StatusScreen";
-import CallsScreen from "./tabs/CallsScreen";
+import ChatsScreen from "./HomeScreenTabs/ChatsScreen";
+import StatusScreen from "./HomeScreenTabs/StatusScreen";
+import CallsScreen from "./HomeScreenTabs/CallsScreen";
 import { Ionicons } from "@expo/vector-icons";
 
 const Tabs = createBottomTabNavigator();

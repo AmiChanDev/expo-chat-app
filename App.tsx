@@ -8,8 +8,8 @@ import ContactScreen from "./src/screens/ContactScreen";
 import AvatarScreen from "./src/screens/AvatarScreen";
 import SignInScreen from "./src/screens/SignInScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
-import SettingScreen from "./src/screens/chatTabs/SettingScreen";
-import HomeScreen from "./src/screens/chatTabs/HomeScreen";
+import SettingScreen from "./src/screens/chatScreenTabs/SettingScreen";
+import HomeScreen from "./src/screens/chatScreenTabs/HomeScreen";
 import HomeTabs from "./src/screens/HomeTabs";
 
 import { NavigationContainer } from "@react-navigation/native";
