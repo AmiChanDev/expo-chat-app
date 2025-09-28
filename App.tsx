@@ -16,7 +16,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { ThemeProvider } from "./src/theme/themeProvider";
 import { UserRegistrationProvider } from "./src/components/UserContext";
 import { AlertNotificationRoot } from "react-native-alert-notification";
-import SingleChatScreen from "./src/screens/SingleChatScreen";
+
+import SingleChatScreen from "./src/screens/chatScreenTabs/SingleChatScreen";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -38,6 +39,9 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+//this page has all the screens and navigation between them
+//ChatScreenTabs has 3 tabs: Home, Status, Calls
+//HomeScreen has 3 tabs in one page: Home,newChat,Settings
 
 export default function App() {
   return (

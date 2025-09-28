@@ -11,7 +11,7 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RootStackParamList } from "../../App";
+import { RootStackParamList } from "../../../App";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
