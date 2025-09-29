@@ -6,58 +6,17 @@ import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ChatStackParamList } from "../HomeScreenTabs/ChatsScreen";
 import { RootStackParamList } from "../../../App";
+import { useChatList } from "../../socket/useChatList";
+import { Chat } from "../../socket/chat";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">
 type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>
-type ChatType = {
-    id: number,
-    name: string,
-    lastMessage: string,
-    time: string,
-    profile: string
 
-}
 export default function HomeScreen() {
     const navigation = useNavigation<HomeScreenProps>();
     const rootNavigation = useNavigation<RootNavigationProp>();
     const [search, setSearch] = useState("");
-    const chats: ChatType[] = [
-        {
-            id: 1,
-            name: "Alice Johnson",
-            lastMessage: "Hey! How are you?",
-            time: "09:15 AM",
-            profile: `https://avatar.iran.liara.run/public/boy?username=Alice`
-        },
-        {
-            id: 2,
-            name: "Bob Smith",
-            lastMessage: "Let's catch up later.",
-            time: "10:30 AM",
-            profile: "https://avatar.iran.liara.run/public/boy?username=Bob"
-        },
-        {
-            id: 3,
-            name: "Carol Lee",
-            lastMessage: "Meeting at 2pm confirmed.",
-            time: "11:45 AM",
-            profile: "https://avatar.iran.liara.run/public/girl?username=Carol"
-        },
-        {
-            id: 4,
-            name: "David Kim",
-            lastMessage: "Check out this photo! Test message to see how it looks in the chat preview. This is a longer message to test text truncation.",
-            time: "12:20 PM",
-            profile: "https://avatar.iran.liara.run/public/boy?username=David"
-        },
-        {
-            id: 5,
-            name: "Eva Brown",
-            lastMessage: "See you soon!",
-            time: "01:05 PM",
-            profile: "https://avatar.iran.liara.run/public/girl?username=Eva"
-        }
-    ];
+    const chatList = useChatList();
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -76,32 +35,38 @@ export default function HomeScreen() {
         });
     }, [navigation]);
 
-    const filteredChats = chats.filter((chat) =>
-        chat.name.toLowerCase().includes(search.toLowerCase()) ||
-        chat.lastMessage.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredChats = chatList.filter((chat) => {
 
-    const renderItem = ({ item }: { item: ChatType }) => (
+        console.log(chat.friendId);
+        // console.log(chat.profileImage);
+
+        return (
+            chat.friendName.toLowerCase().includes(search.toLowerCase()) ||
+            chat.lastMessage.toLowerCase().includes(search.toLowerCase())
+        );
+    });
+
+    const renderItem = ({ item }: { item: Chat }) => (
         <TouchableOpacity
             onPress={() => rootNavigation.navigate("SingleChatScreen", {
-                chatId: item.id,
-                friendName: item.name,
-                lastSeenTime: item.time,
-                profileImage: item.profile
+                chatId: item.friendId,
+                friendName: item.friendName,
+                lastSeenTime: item.lastTimeStamp,
+                profileImage: item.profileImage as string
             })}
         >
             <View className="flex-row items-center p-4 border-b border-gray-200 bg-white">
                 {/* Avatar */}
                 <Image
-                    source={{ uri: item.profile }}
+                    source={{ uri: item.profileImage as string }}
                     className="h-14 w-14 rounded-full border border-gray-300"
                 />
 
                 {/* Name + Message */}
                 <View className="ml-4 flex-1">
                     <View className="flex-row justify-between items-center">
-                        <Text className="font-semibold text-base text-gray-800">{item.name}</Text>
-                        <Text className="text-xs text-gray-500">{item.time}</Text>
+                        <Text className="font-semibold text-base text-gray-800">{item.friendName}</Text>
+                        <Text className="text-xs text-gray-500">{item.lastTimeStamp}</Text>
                     </View>
                     <Text
                         className="text-gray-500 mt-1"
@@ -133,7 +98,7 @@ export default function HomeScreen() {
                 className="mt-4"
                 data={filteredChats}
                 renderItem={renderItem}
-                keyExtractor={item => item.id.toString()}
+                keyExtractor={item => item.friendId.toString()}
             />
 
             {/* chat button */}
