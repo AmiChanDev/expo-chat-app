@@ -7,7 +7,7 @@ export interface User {
   profileImage?: string;
 }
 
-export interface chat {
+export interface Chat {
   id: number;
   message: string;
   from: User;
@@ -24,6 +24,7 @@ export interface WsRequest {
   message?: string;
 }
 
-export interface WSResponse{
-    
+export interface WSResponse {
+  type: string;
+  data:any;
 }
