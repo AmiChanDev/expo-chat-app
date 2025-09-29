@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 
 interface WebSocketContextValue {
@@ -54,5 +54,13 @@ export const WebSocketProvider: React.FC<{
             }}>
             {children}
         </webSocketContext.Provider>)
-
 };
+
+
+export const useWebSocket = () => {
+    const ctx = useContext(webSocketContext);
+    if (!ctx) {
+        throw new Error("useWebSocket must be used within a WebSocketProvider");
+    }
+    return ctx;
+}
