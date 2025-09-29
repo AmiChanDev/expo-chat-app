@@ -4,7 +4,7 @@ import React, { createContext, useEffect, useRef, useState } from "react";
 interface WebSocketContextValue {
     socket: WebSocket | null;
     isConnected: boolean;
-    iserId: number,
+    userId: number,
     sendMessage: (date: any) => void;
 
 }
@@ -43,5 +43,16 @@ export const WebSocketProvider: React.FC<{
             socketRef.current.send(JSON.stringify({ ...data, userId }));
         }
     }
+
+    return (
+        <webSocketContext.Provider
+            value={{
+                socket: socketRef.current,
+                isConnected,
+                userId,
+                sendMessage,
+            }}>
+            {children}
+        </webSocketContext.Provider>)
 
 };
