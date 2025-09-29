@@ -38,4 +38,10 @@ export const WebSocketProvider: React.FC<{
         return () => { socket.close }
     }, [userId]);
 
+    const sendMessage = (data: any) => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({ ...data, userId }));
+        }
+    }
+
 };
