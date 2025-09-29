@@ -18,6 +18,7 @@ import { UserRegistrationProvider } from "./src/components/UserContext";
 import { AlertNotificationRoot } from "react-native-alert-notification";
 
 import SingleChatScreen from "./src/screens/chatScreenTabs/SingleChatScreen";
+import { WebSocketProvider } from "./src/socket/WebSocketProvider";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -44,26 +45,29 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 //HomeScreen has 3 tabs in one page: Home,newChat,Settings
 
 export default function App() {
+  const userId = 5; // Example userId
   return (
     <AlertNotificationRoot>
-      <ThemeProvider>
-        <UserRegistrationProvider>
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName="HomeTabs" screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
-              <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
-              <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
-              <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </UserRegistrationProvider>
-      </ThemeProvider>
+      <WebSocketProvider userId={userId}>
+        <ThemeProvider>
+          <UserRegistrationProvider>
+            <NavigationContainer>
+              <Stack.Navigator initialRouteName="HomeTabs" screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
+                <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+                <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </UserRegistrationProvider>
+        </ThemeProvider>
+      </WebSocketProvider>
     </AlertNotificationRoot>
   );
 }

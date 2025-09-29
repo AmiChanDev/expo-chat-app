@@ -28,6 +28,7 @@ export const WebSocketProvider: React.FC<{
 
         socket.onclose = () => {
             console.log('WebSocket Disonnected....');
+            setConnected(false)
         }
 
         socket.onerror = (error) => {
