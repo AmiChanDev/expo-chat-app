@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HomeScreen from "../chatScreenTabs/HomeScreen";
-import SettingScreen from "../chatScreenTabs/SettingScreen";
-import NewChatScreen from "../chatScreenTabs/NewChatScreen";
+import HomeScreen from "../ChatScreenTabs/HomeScreen";
+import SettingScreen from "../ChatScreenTabs/SettingScreen";
+import NewChatScreen from "../ChatScreenTabs/NewChatScreen";
 
 export type ChatStackParamList = {
   HomeScreen: undefined;
@@ -12,7 +12,7 @@ export type ChatStackParamList = {
 
 const Stack = createNativeStackNavigator();
 
-export default function ChatsScreen() {
+export default function ChatScreen() {
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
       <Stack.Screen
