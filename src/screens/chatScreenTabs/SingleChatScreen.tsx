@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSingleChat } from "../../socket/useSingleChat";
 import { Chat } from "../../socket/chat";
 import { formatChatTime } from "../../util/dateFormatter";
+import { useSendChat } from "../../socket/useSendChat";
 
 type SingleChatScreenProps = NativeStackScreenProps<
     RootStackParamList,
@@ -31,6 +32,7 @@ export default function SingleChatScreen() {
 
     const messages = useSingleChat(chatId); // chatId == friendId
     const [input, setInput] = useState("");
+    const sendMessage = useSendChat();
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -63,6 +65,13 @@ export default function SingleChatScreen() {
         });
     }, [navigation, profileImage, friendName, lastSeenTime]);
 
+    const handleSendChat = () => {
+        if (!input.trim()) return;
+        if (!sendMessage || !chatId) return;
+        sendMessage(chatId, input);
+        setInput("");
+    }
+
     const renderItem = ({ item }: { item: Chat }) => {
         // check if current user is the sender
         const isMe = item.from.id !== chatId;
@@ -83,26 +92,19 @@ export default function SingleChatScreen() {
                     {isMe && (
                         <Ionicons
                             name={
-                                item.status === "read"
+                                item.status === "READ"
                                     ? "checkmark-done-sharp"
-                                    : item.status === "delivered"
+                                    : item.status === "DELIVERED"
                                         ? "checkmark-done-sharp"
                                         : "checkmark"
                             }
                             size={16}
-                            color={item.status === "read" ? "#0284c7" : "#9ca3af"}
+                            color={item.status === "READ" ? "#0284c7" : "#9ca3af"}
                         />
                     )}
                 </View>
             </View>
         );
-    };
-
-    const sendMessage = () => {
-        if (input.trim()) {
-            // you should call sendMessage through websocket here
-            setInput("");
-        }
     };
 
     return (
@@ -131,7 +133,7 @@ export default function SingleChatScreen() {
                     />
                     <TouchableOpacity
                         className="bg-green-600 w-14 h-14 items-center justify-center rounded-full"
-                        onPress={sendMessage}
+                        onPress={handleSendChat}
                     >
                         <Ionicons name="send" size={24} color="white" />
                     </TouchableOpacity>

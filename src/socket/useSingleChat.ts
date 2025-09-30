@@ -18,6 +18,10 @@ export function useSingleChat(friendId: number) {
         const response = JSON.parse(event.data);
         setMessage(response.payload);
       }
+
+      if(response.type =="new_message"){
+        console.log(response.payload);
+      }
     };
 
     socket.addEventListener("message", onMessage);
