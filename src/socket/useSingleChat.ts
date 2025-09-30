@@ -19,7 +19,10 @@ export function useSingleChat(friendId: number) {
         setMessage(response.payload);
       }
 
-      if(response.type =="new_message"){
+      if (
+        response.type == "new_message" &&
+        response.payload.to.id === friendId
+      ) {
         console.log(response.payload);
       }
     };

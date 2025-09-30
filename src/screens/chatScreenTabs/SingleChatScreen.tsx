@@ -109,33 +109,44 @@ export default function SingleChatScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-white" edges={["right", "bottom", "left"]}>
+            <StatusBar hidden={false} />
+
             <KeyboardAvoidingView
                 className="flex-1"
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+                enabled
             >
-                <StatusBar hidden={false} />
-
                 <FlatList
                     data={messages}
                     renderItem={renderItem}
                     keyExtractor={(_, index) => index.toString()}
                     className="flex-1 px-3"
-                    contentContainerStyle={{ paddingBottom: 60 }}
+                    contentContainerStyle={{
+                        paddingTop: 10,
+                        paddingBottom: 20,
+                        flexGrow: 1
+                    }}
+                    showsVerticalScrollIndicator={false}
                 />
 
-                <View className="flex-row items-end p-2 bg-white">
+                <View className="flex-row items-end p-3 bg-white border-t border-gray-100">
                     <TextInput
                         value={input}
                         onChangeText={setInput}
                         multiline
                         placeholder="Type a message"
-                        className="flex-1 min-h-14 max-h-32 h-auto px-5 py-2 bg-gray-200 rounded-3xl text-base"
+                        className="flex-1 min-h-12 max-h-32 px-4 py-3 bg-gray-100 rounded-2xl text-base mr-2"
+                        style={{
+                            textAlignVertical: 'top',
+                            maxHeight: 120
+                        }}
                     />
                     <TouchableOpacity
-                        className="bg-green-600 w-14 h-14 items-center justify-center rounded-full"
+                        className="bg-green-600 w-12 h-12 items-center justify-center rounded-full"
                         onPress={handleSendChat}
                     >
-                        <Ionicons name="send" size={24} color="white" />
+                        <Ionicons name="send" size={20} color="white" />
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
