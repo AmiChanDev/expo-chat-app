@@ -5,6 +5,9 @@ export interface User {
   countryCode: string;
   contactNo: string;
   profileImage?: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string;
 }
 
 export interface Chat {

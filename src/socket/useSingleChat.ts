@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useWebSocket } from "./WebSocketProvider";
-import { Chat, WSResponse } from "./chat";
+import { Chat, User, WSResponse } from "./chat";
 
 export function useSingleChat(friendId: number) {
   const { socket, sendMessage } = useWebSocket();
   const [messages, setMessage] = useState<Chat[]>([]);
+  const [friend, setFriend] = useState<User>();
 
   useEffect(() => {
     if (!socket) {
@@ -32,6 +33,10 @@ export function useSingleChat(friendId: number) {
           setMessage((prevMessages) => [...prevMessages, newMessage]);
         }
       }
+
+      if (response.type == "friend_data") {
+        setFriend(response.payload);
+      }
     };
 
     socket.addEventListener("message", onMessage);
@@ -41,5 +46,5 @@ export function useSingleChat(friendId: number) {
     };
   }, [socket, friendId]);
 
-  return messages;
+  return { messages: messages, friend: friend };
 }

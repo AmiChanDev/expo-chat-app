@@ -36,15 +36,14 @@ export default function HomeScreen() {
     }, [navigation]);
 
     const filteredChats = chatList.filter((chat) => {
-
         // console.log(chat.friendId);
         // console.log(chat.profileImage);
-
         return (
             chat.friendName.toLowerCase().includes(search.toLowerCase()) ||
             chat.lastMessage.toLowerCase().includes(search.toLowerCase())
         );
-    });
+    })
+        .sort((a, b) => new Date(b.lastTimeStamp).getTime() - new Date(a.lastTimeStamp).getTime());
 
     const renderItem = ({ item }: { item: Chat }) => (
         <TouchableOpacity

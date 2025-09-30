@@ -3,6 +3,7 @@ import {
     FlatList,
     Image,
     KeyboardAvoidingView,
+    Keyboard,
     Platform,
     StatusBar,
     Text,
@@ -13,7 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootStackParamList } from "../../../App";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSingleChat } from "../../socket/useSingleChat";
 import { Chat } from "../../socket/chat";
@@ -26,23 +27,51 @@ type SingleChatScreenProps = NativeStackScreenProps<
 >;
 
 export default function SingleChatScreen() {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "SingleChatScreen">>();
+    const navigation = useNavigation<
+        NativeStackNavigationProp<RootStackParamList, "SingleChatScreen">
+    >();
     const route = useRoute<SingleChatScreenProps["route"]>();
-    const { chatId, friendName, profileImage, lastSeenTime } = route.params;
+    const { chatId, profileImage, lastSeenTime } = route.params;
 
-    const messages = useSingleChat(chatId) || []; // chatId == friendId, ensure array
+    const singleChat = useSingleChat(chatId);
+    const messages = singleChat?.messages ?? [];
+    const friend = singleChat?.friend;
+
     const [input, setInput] = useState("");
     const sendMessage = useSendChat();
 
-    // Scroll to bottom whenever messages change
     const flatListRef = useRef<FlatList<Chat>>(null);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+        });
+
+        const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => { });
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
 
     useLayoutEffect(() => {
         if (flatListRef.current && messages.length > 0) {
-            // Use scrollToEnd for better performance with inverted list
-            flatListRef.current.scrollToEnd({ animated: true });
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 100);
         }
     }, [messages]);
+
+    useLayoutEffect(() => {
+        if (flatListRef.current && messages.length > 0) {
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: false });
+            }, 50);
+        }
+    }, []);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -60,9 +89,11 @@ export default function SingleChatScreen() {
                         className="h-14 w-14 rounded-full border-2 border-gray-400 p-1"
                     />
                     <View className="space-y-2">
-                        <Text className="font-bold text-2xl">{friendName}</Text>
+                        <Text className="font-bold text-2xl">
+                            {friend?.firstName + " " + friend?.lastName}
+                        </Text>
                         <Text className="italic text-xs font-bold text-gray-500">
-                            Pending
+                            {friend?.status}
                         </Text>
                     </View>
                 </View>
@@ -73,7 +104,7 @@ export default function SingleChatScreen() {
                 </TouchableOpacity>
             ),
         });
-    }, [navigation, profileImage, friendName, lastSeenTime]);
+    }, [navigation, friend, lastSeenTime, profileImage]);
 
     const handleSendChat = () => {
         if (!input.trim()) return;
@@ -85,15 +116,16 @@ export default function SingleChatScreen() {
         try {
             sendMessage(chatId, input.trim());
             setInput("");
+
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 100);
         } catch (error) {
             console.error("Error sending message:", error);
         }
-    }
+    };
 
     const renderItem = ({ item }: { item: Chat }) => {
-        // check if current user is the sender
-        // chatId is the friend's ID, so if message is FROM chatId, it's from the friend (not me)
-        // if message is TO chatId, it's from me to the friend
         const isMe = item.from.id !== chatId;
 
         return (
@@ -128,15 +160,10 @@ export default function SingleChatScreen() {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
-        >
-            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={["right", "bottom", "left"]}>
+        <View style={{ flex: 1, backgroundColor: "white" }}>
+            <SafeAreaView style={{ flex: 1 }} edges={["top", "right", "left"]}>
                 <StatusBar hidden={false} />
 
-                {/* Messages List Container */}
                 <View style={{ flex: 1 }}>
                     <FlatList
                         ref={flatListRef}
@@ -147,7 +174,8 @@ export default function SingleChatScreen() {
                         contentContainerStyle={{
                             paddingTop: 10,
                             paddingBottom: 10,
-                            flexGrow: 1
+                            flexGrow: 1,
+                            justifyContent: messages.length > 0 ? "flex-end" : "center",
                         }}
                         showsVerticalScrollIndicator={false}
                         automaticallyAdjustContentInsets={false}
@@ -156,59 +184,73 @@ export default function SingleChatScreen() {
                         maintainVisibleContentPosition={{
                             minIndexForVisible: 0,
                         }}
+                        onContentSizeChange={() => {
+                            setTimeout(() => {
+                                flatListRef.current?.scrollToEnd({ animated: true });
+                            }, 100);
+                        }}
                     />
                 </View>
-
-                {/* Fixed Input Area at Bottom */}
-                <View style={{
-                    borderTopWidth: 1,
-                    borderTopColor: '#f3f4f6',
-                    backgroundColor: 'white',
-                    paddingTop: 8,
-                    paddingBottom: 12,
-                    paddingHorizontal: 12
-                }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                        <TextInput
-                            value={input}
-                            onChangeText={setInput}
-                            multiline
-                            placeholder="Type a message"
-                            returnKeyType="send"
-                            onSubmitEditing={handleSendChat}
-                            blurOnSubmit={false}
-                            style={{
-                                flex: 1,
-                                minHeight: 48,
-                                maxHeight: 120,
-                                paddingHorizontal: 16,
-                                paddingVertical: 12,
-                                backgroundColor: '#f3f4f6',
-                                borderRadius: 24,
-                                fontSize: 16,
-                                marginRight: 8,
-                                textAlignVertical: 'center'
-                            }}
-                        />
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: input.trim() ? '#16a34a' : '#9ca3af',
-                                width: 48,
-                                height: 48,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 24,
-                                marginBottom: 4
-                            }}
-                            onPress={handleSendChat}
-                            disabled={!input.trim()}
-                            activeOpacity={0.7}
-                        >
-                            <Ionicons name="send" size={20} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
             </SafeAreaView>
-        </KeyboardAvoidingView>
+
+            {/* Input Area - Only ONE KeyboardAvoidingView */}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+            >
+                <SafeAreaView style={{ backgroundColor: "white" }} edges={["bottom"]}>
+                    <View
+                        style={{
+                            borderTopWidth: 1,
+                            borderTopColor: "#f3f4f6",
+                            backgroundColor: "white",
+                            paddingTop: 8,
+                            paddingBottom: 12,
+                            paddingHorizontal: 12,
+                        }}
+                    >
+                        <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                            <TextInput
+                                value={input}
+                                onChangeText={setInput}
+                                multiline
+                                placeholder="Type a message"
+                                returnKeyType="send"
+                                onSubmitEditing={handleSendChat}
+                                blurOnSubmit={false}
+                                style={{
+                                    flex: 1,
+                                    minHeight: 48,
+                                    maxHeight: 120,
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 12,
+                                    backgroundColor: "#f3f4f6",
+                                    borderRadius: 24,
+                                    fontSize: 16,
+                                    marginRight: 8,
+                                    textAlignVertical: "top",
+                                }}
+                            />
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor: input.trim() ? "#16a34a" : "#9ca3af",
+                                    width: 48,
+                                    height: 48,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    borderRadius: 24,
+                                }}
+                                onPress={handleSendChat}
+                                disabled={!input.trim()}
+                                activeOpacity={0.7}
+                            >
+                                <Ionicons name="send" size={20} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
+        </View>
     );
 }
+

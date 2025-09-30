@@ -14,6 +14,7 @@ export function useChatList(): Chat[] {
     const onMessage = (event: MessageEvent) => {
       let response: WSResponse = JSON.parse(event.data);
       // console.log(response.payload);
+      console.log("Chat list loaded");
       if (response.type == "friend_list") {
         setChatList(response.payload);
       }
