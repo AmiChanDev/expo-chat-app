@@ -108,48 +108,79 @@ export default function SingleChatScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white" edges={["right", "bottom", "left"]}>
-            <StatusBar hidden={false} />
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
+        >
+            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} edges={["right", "bottom", "left"]}>
+                <StatusBar hidden={false} />
 
-            <KeyboardAvoidingView
-                className="flex-1"
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-                enabled
-            >
-                <FlatList
-                    data={messages}
-                    renderItem={renderItem}
-                    keyExtractor={(_, index) => index.toString()}
-                    className="flex-1 px-3"
-                    contentContainerStyle={{
-                        paddingTop: 10,
-                        paddingBottom: 20,
-                        flexGrow: 1
-                    }}
-                    showsVerticalScrollIndicator={false}
-                />
-
-                <View className="flex-row items-end p-3 bg-white border-t border-gray-100">
-                    <TextInput
-                        value={input}
-                        onChangeText={setInput}
-                        multiline
-                        placeholder="Type a message"
-                        className="flex-1 min-h-12 max-h-32 px-4 py-3 bg-gray-100 rounded-2xl text-base mr-2"
-                        style={{
-                            textAlignVertical: 'top',
-                            maxHeight: 120
+                {/* Messages List Container */}
+                <View style={{ flex: 1 }}>
+                    <FlatList
+                        data={messages}
+                        renderItem={renderItem}
+                        keyExtractor={(_, index) => index.toString()}
+                        style={{ flex: 1, paddingHorizontal: 12 }}
+                        contentContainerStyle={{
+                            paddingTop: 10,
+                            paddingBottom: 10,
+                            flexGrow: 1
                         }}
+                        showsVerticalScrollIndicator={false}
+                        automaticallyAdjustContentInsets={false}
+                        contentInsetAdjustmentBehavior="never"
+                        inverted={false}
                     />
-                    <TouchableOpacity
-                        className="bg-green-600 w-12 h-12 items-center justify-center rounded-full"
-                        onPress={handleSendChat}
-                    >
-                        <Ionicons name="send" size={20} color="white" />
-                    </TouchableOpacity>
                 </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+
+                {/* Fixed Input Area at Bottom */}
+                <View style={{
+                    borderTopWidth: 1,
+                    borderTopColor: '#f3f4f6',
+                    backgroundColor: 'white',
+                    paddingTop: 8,
+                    paddingBottom: 12,
+                    paddingHorizontal: 12
+                }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                        <TextInput
+                            value={input}
+                            onChangeText={setInput}
+                            multiline
+                            placeholder="Type a message"
+                            style={{
+                                flex: 1,
+                                minHeight: 48,
+                                maxHeight: 120,
+                                paddingHorizontal: 16,
+                                paddingVertical: 12,
+                                backgroundColor: '#f3f4f6',
+                                borderRadius: 24,
+                                fontSize: 16,
+                                marginRight: 8,
+                                textAlignVertical: 'center'
+                            }}
+                        />
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor: '#16a34a',
+                                width: 48,
+                                height: 48,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 24,
+                                marginBottom: 4
+                            }}
+                            onPress={handleSendChat}
+                            disabled={!input.trim()}
+                        >
+                            <Ionicons name="send" size={20} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 }
