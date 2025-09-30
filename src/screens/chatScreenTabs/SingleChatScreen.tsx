@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootStackParamList } from "../../../App";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSingleChat } from "../../socket/useSingleChat";
 import { Chat } from "../../socket/chat";
@@ -30,9 +30,19 @@ export default function SingleChatScreen() {
     const route = useRoute<SingleChatScreenProps["route"]>();
     const { chatId, friendName, profileImage, lastSeenTime } = route.params;
 
-    const messages = useSingleChat(chatId); // chatId == friendId
+    const messages = useSingleChat(chatId) || []; // chatId == friendId, ensure array
     const [input, setInput] = useState("");
     const sendMessage = useSendChat();
+
+    // Scroll to bottom whenever messages change
+    const flatListRef = useRef<FlatList<Chat>>(null);
+
+    useLayoutEffect(() => {
+        if (flatListRef.current && messages.length > 0) {
+            // Use scrollToEnd for better performance with inverted list
+            flatListRef.current.scrollToEnd({ animated: true });
+        }
+    }, [messages]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -52,7 +62,7 @@ export default function SingleChatScreen() {
                     <View className="space-y-2">
                         <Text className="font-bold text-2xl">{friendName}</Text>
                         <Text className="italic text-xs font-bold text-gray-500">
-                            Last seen {lastSeenTime}
+                            Pending
                         </Text>
                     </View>
                 </View>
@@ -67,13 +77,23 @@ export default function SingleChatScreen() {
 
     const handleSendChat = () => {
         if (!input.trim()) return;
-        if (!sendMessage || !chatId) return;
-        sendMessage(chatId, input);
-        setInput("");
+        if (!sendMessage || !chatId) {
+            console.warn("Cannot send message: missing sendMessage function or chatId");
+            return;
+        }
+
+        try {
+            sendMessage(chatId, input.trim());
+            setInput("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     }
 
     const renderItem = ({ item }: { item: Chat }) => {
         // check if current user is the sender
+        // chatId is the friend's ID, so if message is FROM chatId, it's from the friend (not me)
+        // if message is TO chatId, it's from me to the friend
         const isMe = item.from.id !== chatId;
 
         return (
@@ -119,9 +139,10 @@ export default function SingleChatScreen() {
                 {/* Messages List Container */}
                 <View style={{ flex: 1 }}>
                     <FlatList
+                        ref={flatListRef}
                         data={messages}
                         renderItem={renderItem}
-                        keyExtractor={(_, index) => index.toString()}
+                        keyExtractor={(item, index) => `${item.createdAt}-${index}`}
                         style={{ flex: 1, paddingHorizontal: 12 }}
                         contentContainerStyle={{
                             paddingTop: 10,
@@ -132,6 +153,9 @@ export default function SingleChatScreen() {
                         automaticallyAdjustContentInsets={false}
                         contentInsetAdjustmentBehavior="never"
                         inverted={false}
+                        maintainVisibleContentPosition={{
+                            minIndexForVisible: 0,
+                        }}
                     />
                 </View>
 
@@ -150,6 +174,9 @@ export default function SingleChatScreen() {
                             onChangeText={setInput}
                             multiline
                             placeholder="Type a message"
+                            returnKeyType="send"
+                            onSubmitEditing={handleSendChat}
+                            blurOnSubmit={false}
                             style={{
                                 flex: 1,
                                 minHeight: 48,
@@ -165,7 +192,7 @@ export default function SingleChatScreen() {
                         />
                         <TouchableOpacity
                             style={{
-                                backgroundColor: '#16a34a',
+                                backgroundColor: input.trim() ? '#16a34a' : '#9ca3af',
                                 width: 48,
                                 height: 48,
                                 alignItems: 'center',
@@ -175,6 +202,7 @@ export default function SingleChatScreen() {
                             }}
                             onPress={handleSendChat}
                             disabled={!input.trim()}
+                            activeOpacity={0.7}
                         >
                             <Ionicons name="send" size={20} color="white" />
                         </TouchableOpacity>

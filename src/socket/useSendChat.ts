@@ -9,11 +9,11 @@ export function useSendChat() {
       toUserId,
       message,
     });
-    console.log("Sending message:", {
-      type: "send_message",
-      toUserId,
-      message,
-    });
+    // console.log("Sending message:", {
+    //   type: "send_message",
+    //   toUserId,
+    //   message,
+    // });
   };
 
   return sendChat;

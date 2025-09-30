@@ -37,7 +37,7 @@ export default function HomeScreen() {
 
     const filteredChats = chatList.filter((chat) => {
 
-        console.log(chat.friendId);
+        // console.log(chat.friendId);
         // console.log(chat.profileImage);
 
         return (

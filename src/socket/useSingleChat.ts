@@ -14,16 +14,17 @@ export function useSingleChat(friendId: number) {
 
     const onMessage = (event: MessageEvent) => {
       const response: WSResponse = JSON.parse(event.data);
-      console.log("Received WebSocket message:", response);
+      // console.log("Received WebSocket message:", response);
 
       if (response.type == "single_chat") {
-        console.log("Setting initial chat messages:", response.payload);
+        console.log("Setting initial chat messages");
+        // console.log("Setting initial chat messages:", response.payload);
         setMessage(response.payload);
       }
 
       if (response.type == "new_message") {
         const newMessage = response.payload;
-        console.log("Received new message:", newMessage);
+        // console.log("Received new message:", newMessage);
         // Add new message if it's part of this chat (either sent to or from the friend)
         if (newMessage.to.id === friendId || newMessage.from.id === friendId) {
           console.log("Adding new message to chat");
