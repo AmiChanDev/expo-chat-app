@@ -130,10 +130,9 @@ export default function SingleChatScreen() {
 
         return (
             <View
-                className={`my-1 px-3 py-3 max-w-[75%] 
-                    ${isMe
-                        ? "self-end bg-green-900 rounded-tl-xl rounded-bl-xl rounded-br-xl"
-                        : "self-start bg-gray-700 rounded-tr-xl rounded-bl-xl rounded-br-xl"
+                className={`my-1 px-3 py-3 max-w-[75%] ${isMe
+                    ? "self-end bg-green-900 rounded-tl-xl rounded-bl-xl rounded-br-xl"
+                    : "self-start bg-gray-700 rounded-tr-xl rounded-bl-xl rounded-br-xl"
                     }`}
             >
                 <Text className="text-white text-base">{item.message}</Text>
@@ -144,11 +143,9 @@ export default function SingleChatScreen() {
                     {isMe && (
                         <Ionicons
                             name={
-                                item.status === "READ"
+                                item.status === "READ" || item.status === "DELIVERED"
                                     ? "checkmark-done-sharp"
-                                    : item.status === "DELIVERED"
-                                        ? "checkmark-done-sharp"
-                                        : "checkmark"
+                                    : "checkmark"
                             }
                             size={16}
                             color={item.status === "READ" ? "#0284c7" : "#9ca3af"}
@@ -161,9 +158,8 @@ export default function SingleChatScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: "white" }}>
-            <SafeAreaView style={{ flex: 1 }} edges={["top", "right", "left"]}>
+            <SafeAreaView style={{ flex: 1 }} edges={["right", "left"]}>
                 <StatusBar hidden={false} />
-
                 <View style={{ flex: 1 }}>
                     <FlatList
                         ref={flatListRef}
@@ -172,84 +168,48 @@ export default function SingleChatScreen() {
                         keyExtractor={(item, index) => `${item.createdAt}-${index}`}
                         style={{ flex: 1, paddingHorizontal: 12 }}
                         contentContainerStyle={{
-                            paddingTop: 10,
-                            paddingBottom: 10,
                             flexGrow: 1,
                             justifyContent: messages.length > 0 ? "flex-end" : "center",
                         }}
                         showsVerticalScrollIndicator={false}
-                        automaticallyAdjustContentInsets={false}
-                        contentInsetAdjustmentBehavior="never"
-                        inverted={false}
-                        maintainVisibleContentPosition={{
-                            minIndexForVisible: 0,
-                        }}
-                        onContentSizeChange={() => {
-                            setTimeout(() => {
-                                flatListRef.current?.scrollToEnd({ animated: true });
-                            }, 100);
-                        }}
+                        onContentSizeChange={() =>
+                            flatListRef.current?.scrollToEnd({ animated: true })
+                        }
                     />
                 </View>
-            </SafeAreaView>
 
-            {/* Input Area - Only ONE KeyboardAvoidingView */}
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-            >
-                <SafeAreaView style={{ backgroundColor: "white" }} edges={["bottom"]}>
-                    <View
-                        style={{
-                            borderTopWidth: 1,
-                            borderTopColor: "#f3f4f6",
-                            backgroundColor: "white",
-                            paddingTop: 8,
-                            paddingBottom: 12,
-                            paddingHorizontal: 12,
-                        }}
-                    >
-                        <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                            <TextInput
-                                value={input}
-                                onChangeText={setInput}
-                                multiline
-                                placeholder="Type a message"
-                                returnKeyType="send"
-                                onSubmitEditing={handleSendChat}
-                                blurOnSubmit={false}
-                                style={{
-                                    flex: 1,
-                                    minHeight: 48,
-                                    maxHeight: 120,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    backgroundColor: "#f3f4f6",
-                                    borderRadius: 24,
-                                    fontSize: 16,
-                                    marginRight: 8,
-                                    textAlignVertical: "top",
-                                }}
-                            />
-                            <TouchableOpacity
-                                style={{
-                                    backgroundColor: input.trim() ? "#16a34a" : "#9ca3af",
-                                    width: 48,
-                                    height: 48,
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    borderRadius: 24,
-                                }}
-                                onPress={handleSendChat}
-                                disabled={!input.trim()}
-                                activeOpacity={0.7}
-                            >
-                                <Ionicons name="send" size={20} color="white" />
-                            </TouchableOpacity>
+                {/* Input Area */}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+                >
+                    <SafeAreaView className="bg-white" edges={["left", "right"]}>
+                        <View className="border-t border-gray-100 bg-white pt-2 pb-3 px-3">
+                            <View className="flex-row items-end mb-4">
+                                <TextInput
+                                    value={input}
+                                    onChangeText={setInput}
+                                    multiline
+                                    placeholder="Type a message"
+                                    returnKeyType="send"
+                                    onSubmitEditing={handleSendChat}
+                                    className="flex-1 min-h-12 max-h-32 px-4 py-3 bg-gray-100 rounded-full text-base mr-2 text-black"
+                                    style={{ textAlignVertical: "top" }}
+                                />
+                                <TouchableOpacity
+                                    className={`w-12 h-12 items-center justify-center rounded-full ${input.trim() ? "bg-green-700" : "bg-gray-400"
+                                        }`}
+                                    onPress={handleSendChat}
+                                    disabled={!input.trim()}
+                                    activeOpacity={0.7}
+                                >
+                                    <Ionicons name="send" size={20} color="white" />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                </SafeAreaView>
-            </KeyboardAvoidingView>
+                    </SafeAreaView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
         </View>
     );
 }
