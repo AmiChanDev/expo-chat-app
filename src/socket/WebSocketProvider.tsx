@@ -18,25 +18,47 @@ export const WebSocketProvider: React.FC<{
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const socket = new WebSocket(`wss://${process.env.EXPO_PUBLIC_WS_URL}/ChatApp/chat?userId=${userId}`);
-
-        socketRef.current = socket;
-        socket.onopen = () => {
-            console.log('WebSocket Connected....');
-            setConnected(true)
+        // Close existing connection if it exists
+        if (socketRef.current) {
+            socketRef.current.close();
         }
 
-        socket.onclose = () => {
-            console.log('WebSocket Disonnected....');
-            setConnected(false)
+        // Only connect if userId is valid (not 0 or null)
+        if (userId && userId > 0) {
+            console.log(`Connecting WebSocket for userId: ${userId}`);
+            const wsUrl = process.env.EXPO_PUBLIC_WS_URL || 'localhost:8080';
+            const fullUrl = `wss://${wsUrl}/ChatApp/chat?userId=${userId}`;
+            console.log(`WebSocket URL: ${fullUrl}`);
+
+            const socket = new WebSocket(fullUrl);
+
+            socketRef.current = socket;
+            socket.onopen = () => {
+                console.log(`WebSocket Connected for userId: ${userId}`);
+                setConnected(true)
+            }
+
+            socket.onclose = (event) => {
+                console.log('WebSocket Disconnected....', event.code, event.reason);
+                setConnected(false)
+            }
+
+            socket.onerror = (error) => {
+                console.log('WebSocket Error:', error)
+                setConnected(false)
+            }
+
+            // Removed onmessage here to avoid conflicts with useChatList
+        } else {
+            console.log('No valid userId, not connecting WebSocket');
+            setConnected(false);
         }
 
-        socket.onerror = (error) => {
-            console.log(error)
-            setConnected(false)
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
         }
-
-        return () => { socket.close }
     }, [userId]);
 
     const sendMessage = (data: any) => {

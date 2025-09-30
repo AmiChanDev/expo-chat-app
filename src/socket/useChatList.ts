@@ -18,11 +18,6 @@ export function useChatList(): Chat[] {
       if (response.type == "friend_list") {
         setChatList(response.payload);
       }
-
-      // if (data.type === "friend_list") {
-      //   setChatList(data.data);
-      //   console.log("Chat list updated:", data.data);
-      // }
     };
 
     socket.addEventListener("message", onMessage);

@@ -2,11 +2,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { View, Text, TouchableOpacity, TextInput, FlatList, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ChatStackParamList } from "../HomeScreenTabs/ChatScreen";
 import { RootStackParamList } from "../../../App";
 import { useChatList } from "../../socket/useChatList";
+import { useWebSocket } from "../../socket/WebSocketProvider";
 import { Chat } from "../../socket/chat";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">
@@ -17,6 +18,14 @@ export default function HomeScreen() {
     const rootNavigation = useNavigation<RootNavigationProp>();
     const [search, setSearch] = useState("");
     const chatList = useChatList();
+    const { isConnected, userId } = useWebSocket();
+
+    useEffect(() => {
+        console.log('HomeScreen - Chat list updated:', chatList.length, 'chats');
+        console.log('HomeScreen - Chat list data:', chatList);
+        console.log('HomeScreen - WebSocket connected:', isConnected, 'userId:', userId);
+    }, [chatList, isConnected, userId]);
+
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -98,6 +107,24 @@ export default function HomeScreen() {
                 data={filteredChats}
                 renderItem={renderItem}
                 keyExtractor={item => item.friendId.toString()}
+                ListEmptyComponent={() => (
+                    <View className="flex-1 justify-center items-center p-8">
+                        <Text className="text-gray-500 text-lg text-center">
+                            {chatList.length === 0 ?
+                                'No chats found. Make sure WebSocket is connected.' :
+                                'No chats match your search.'}
+                        </Text>
+                        <Text className="text-gray-400 text-sm mt-2">
+                            WebSocket: {isConnected ? 'Connected' : 'Disconnected'}
+                        </Text>
+                        <Text className="text-gray-400 text-sm">
+                            User ID: {userId}
+                        </Text>
+                        <Text className="text-gray-400 text-sm">
+                            Chat list length: {chatList.length}
+                        </Text>
+                    </View>
+                )}
             />
 
             {/* chat button */}

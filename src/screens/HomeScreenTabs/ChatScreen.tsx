@@ -8,6 +8,7 @@ export type ChatStackParamList = {
   HomeScreen: undefined;
   SettingScreen: undefined;
   NewChatScreen: undefined;
+  mockLogin: undefined;
 };
 
 const Stack = createNativeStackNavigator();
