@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ChatStackParamList } from "../HomeScreenTabs/ChatsScreen";
+import { ChatStackParamList } from "../HomeScreenTabs/ChatScreen";
 import { RootStackParamList } from "../../../App";
 import { useChatList } from "../../socket/useChatList";
 import { Chat } from "../../socket/chat";

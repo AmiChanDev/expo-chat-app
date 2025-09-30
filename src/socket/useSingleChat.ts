@@ -11,6 +11,7 @@ export function useSingleChat(friendId: number) {
       return;
     }
     sendMessage({ type: "get_single_chat", friendId });
+    sendMessage({ type: "friend_data", friendId });
 
     const onMessage = (event: MessageEvent) => {
       const response: WSResponse = JSON.parse(event.data);
