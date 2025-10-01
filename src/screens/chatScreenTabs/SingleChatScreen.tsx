@@ -96,13 +96,20 @@ export default function SingleChatScreen() {
                             className="w-10 h-10 rounded-full border-2 border-gray-200"
                             defaultSource={require("../../assets/avatar.png")}
                         />
-                        <View className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
+                        <View
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${(friend?.status || "ONLINE") === "ONLINE"
+                                ? "bg-green-500"
+                                : "bg-red-500"
+                                }`}
+                        />
                     </View>
                     <View className="flex-1">
                         <Text className="font-semibold text-lg text-gray-800" numberOfLines={1}>
                             {friend?.firstName} {friend?.lastName}
                         </Text>
-                        <Text className="text-xs text-green-600 font-medium">
+                        <Text
+                            className={`text-xs font-medium ${friend?.status === "ONLINE" ? "text-green-600" : "text-red-500"}`}
+                        >
                             {friend?.status || "Online"}
                         </Text>
                     </View>
@@ -226,13 +233,14 @@ export default function SingleChatScreen() {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
                 >
-                    <SafeAreaView className="bg-white border-t border-gray-100" edges={["left", "right"]}>
-                        <View className="px-4 py-3">
+                    <SafeAreaView className="bg-white border-t border-gray-100" edges={["bottom", "left", "right"]}>
+                        <View className="px-1 py-3">
                             <View className="flex-row items-end gap-3">
-                                <TouchableOpacity className="w-10 h-10 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
+                                {/* + Icon */}
+                                <TouchableOpacity className="w-12 h-12 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
                                     <Ionicons name="add" size={24} color="#6b7280" />
                                 </TouchableOpacity>
-                                <View className="flex-1 max-h-32 bg-gray-100 rounded-3xl px-4 py-2">
+                                <View className="flex-1 max-h-12 justify-center bg-gray-100 rounded-3xl px-4 py-2">
                                     <TextInput
                                         value={input}
                                         onChangeText={setInput}
@@ -247,7 +255,7 @@ export default function SingleChatScreen() {
                                 </View>
                                 {input.trim() ? (
                                     <TouchableOpacity
-                                        className="w-10 h-10 items-center justify-center rounded-full bg-blue-500 shadow-lg"
+                                        className="w-11 h-12 items-center justify-center rounded-full bg-blue-500 shadow-lg"
                                         onPress={handleSendChat}
                                         activeOpacity={0.8}
                                     >
@@ -255,10 +263,10 @@ export default function SingleChatScreen() {
                                     </TouchableOpacity>
                                 ) : (
                                     <View className="flex-row gap-2">
-                                        <TouchableOpacity className="w-10 h-10 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
+                                        <TouchableOpacity className="w-12 h-12 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
                                             <Ionicons name="camera" size={22} color="#6b7280" />
                                         </TouchableOpacity>
-                                        <TouchableOpacity className="w-10 h-10 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
+                                        <TouchableOpacity className="w-12 h-12 justify-center items-center rounded-full bg-gray-100" activeOpacity={0.7}>
                                             <Ionicons name="mic" size={22} color="#6b7280" />
                                         </TouchableOpacity>
                                     </View>

@@ -86,8 +86,9 @@ export default function HomeScreen() {
         .sort((a, b) => new Date(b.lastTimeStamp).getTime() - new Date(a.lastTimeStamp).getTime());
 
     const renderItem = ({ item }: { item: Chat }) => (
+
         <TouchableOpacity
-            className="bg-white rounded-2xl my-1 mx-1 shadow-sm"
+            className="bg-white rounded-2xl my-1 mx-1 shadow-sm border border-gray-100"
             activeOpacity={0.7}
             onPress={() => rootNavigation.navigate("SingleChatScreen", {
                 chatId: item.friendId,
@@ -98,7 +99,7 @@ export default function HomeScreen() {
         >
             <View className="flex-row items-center p-4">
                 {/* Avatar with online indicator */}
-                <View className="relative">
+                <View className="relative mr-4">
                     <Image
                         source={{
                             uri: item.profileImage as string || `https://avatar.iran.liara.run/public/${item.friendId}`
@@ -107,11 +108,14 @@ export default function HomeScreen() {
                         defaultSource={require("../../assets/avatar.png")}
                     />
                     {/* Online indicator */}
-                    <View className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-white" />
+                    {/* <View
+                        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${item.status === "READ" ? "bg-green-500" : "bg-red-500"}`}
+                    /> */}
+                    {/* <Text>{`${item.status}`}</Text> */}
                 </View>
 
                 {/* Chat Content */}
-                <View className="ml-4 flex-1">
+                <View className="flex-1">
                     <View className="flex-row justify-between items-center mb-1">
                         <Text className="text-base font-semibold text-gray-800 flex-1 mr-2" numberOfLines={1}>
                             {item.friendName}
@@ -147,18 +151,22 @@ export default function HomeScreen() {
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
             {/* Search Bar */}
-            <View className="px-4 py-3 bg-slate-50">
-                <View className="flex-row items-center bg-white rounded-xl px-4 py-3 shadow-sm">
+            <View className="px-4 bg-slate-50/80">
+                <View className="px-2 flex-row items-center bg-white rounded-2xl py-2 shadow-sm border border-gray-100">
                     <Ionicons name="search" size={20} color="#9ca3af" />
                     <TextInput
-                        className="flex-1 ml-3 text-base text-gray-700"
-                        placeholder="Search chats..."
+                        className="px-1 flex-1 text-base text-gray-700"
+                        placeholder="Search conversations..."
                         placeholderTextColor="#9ca3af"
                         value={search}
                         onChangeText={setSearch}
                     />
                     {search.length > 0 && (
-                        <TouchableOpacity onPress={() => setSearch("")}>
+                        <TouchableOpacity
+                            onPress={() => setSearch("")}
+                            className="p-1 rounded-full active:bg-gray-100"
+                            activeOpacity={0.7}
+                        >
                             <Ionicons name="close-circle" size={20} color="#9ca3af" />
                         </TouchableOpacity>
                     )}
@@ -174,22 +182,38 @@ export default function HomeScreen() {
                 contentContainerStyle={{ paddingTop: 8, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={() => (
-                    <View className="flex-1 justify-center items-center py-16 px-8">
-                        <Ionicons name="chatbubbles-outline" size={64} color="#d1d5db" />
-                        <Text className="text-xl font-semibold text-gray-700 mt-4 text-center">
-                            {chatList.length === 0 ? 'No conversations yet' : 'No chats found'}
+                    <View className="flex-1 justify-center items-center py-20 px-8">
+                        <View className="w-24 h-24 rounded-full bg-blue-100 justify-center items-center mb-6">
+                            <Ionicons name="chatbubbles-outline" size={48} color="#3b82f6" />
+                        </View>
+                        <Text className="text-xl font-bold text-gray-800 text-center mb-2">
+                            {chatList.length === 0 ? 'Welcome to Chats!' : 'No chats found'}
                         </Text>
-                        <Text className="text-sm text-gray-400 mt-2 text-center leading-5">
+                        <Text className="text-sm text-gray-500 text-center leading-6 mb-6">
                             {chatList.length === 0
-                                ? 'Start a new conversation by tapping the chat button'
-                                : 'Try searching with different keywords'}
+                                ? 'Start meaningful conversations with your friends and family'
+                                : 'Try adjusting your search terms'}
                         </Text>
-                        <View className="mt-4 p-3 bg-blue-50 rounded-lg">
-                            <Text className="text-blue-600 text-sm font-medium">
-                                WebSocket: {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-                            </Text>
-                            <Text className="text-blue-500 text-xs mt-1">
-                                User ID: {userId} • Chats: {chatList.length}
+
+                        {chatList.length === 0 && (
+                            <TouchableOpacity
+                                className="bg-blue-500 px-6 py-3 rounded-full shadow-lg mb-6"
+                                activeOpacity={0.8}
+                                onPress={() => navigation.navigate("NewChatScreen")}
+                            >
+                                <Text className="text-white font-semibold">Start New Chat</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        <View className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+                            <View className="flex-row items-center justify-center mb-2">
+                                <View className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                                <Text className={`text-sm font-medium ${isConnected ? 'text-green-700' : 'text-red-700'}`}>
+                                    {isConnected ? 'Connected' : 'Disconnected'}
+                                </Text>
+                            </View>
+                            <Text className="text-xs text-gray-600 text-center">
+                                User: {userId} • Chats: {chatList.length}
                             </Text>
                         </View>
                     </View>
@@ -199,11 +223,11 @@ export default function HomeScreen() {
             {/* Floating Action Button */}
             <View className="absolute bottom-6 right-6">
                 <TouchableOpacity
-                    className="w-14 h-14 rounded-full bg-blue-500 justify-center items-center shadow-lg"
+                    className="w-16 h-16 rounded-full bg-blue-500 justify-center items-center shadow-xl shadow-blue-500/30 border-2 border-white"
                     activeOpacity={0.8}
                     onPress={() => navigation.navigate("NewChatScreen")}
                 >
-                    <Ionicons name="add" size={28} color="white" />
+                    <Ionicons name="add" size={32} color="white" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
