@@ -15,6 +15,8 @@ import HomeScreen from "./src/screens/ChatScreenTabs/HomeScreen";
 import SingleChatScreen from "./src/screens/ChatScreenTabs/SingleChatScreen";
 import SettingScreen from "./src/screens/ChatScreenTabs/SettingScreen";
 
+import NewChatScreen from "./src/screens/ChatScreenTabs/NewChatScreen";
+
 //Testing
 import MockLogin from "./src/screens/Test/mockLogin";
 
@@ -44,6 +46,8 @@ export type RootStackParamList = {
     lastSeenTime: string;
     profileImage: string;
   };
+
+  NewChatScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,8 +57,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
 
-  const [userId, setUserId] = useState<number | null>(-1);
-  // const userId = 5; // Example userId
+  // const [userId, setUserId] = useState<number | null>(-1);
+  const userId = 5; // Example userId
   return (
     <AlertNotificationRoot>
 
@@ -62,23 +66,25 @@ export default function App() {
         <ThemeProvider>
           <UserRegistrationProvider>
             <NavigationContainer>
-              <Stack.Navigator initialRouteName="MockLogin" screenOptions={{ headerShown: false }}>
+              <Stack.Navigator initialRouteName="HomeTabs" screenOptions={{ headerShown: false }}>
 
                 {/* Testing Login */}
-                <Stack.Screen name="MockLogin">
+                {/* <Stack.Screen name="MockLogin">
                   {(props) => <MockLogin {...props} setUserId={setUserId} />}
-                </Stack.Screen>
+                </Stack.Screen> */}
 
                 <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
                 <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />
+
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="NewChatScreen" component={NewChatScreen} options={{ headerShown: false }} />
               </Stack.Navigator>
             </NavigationContainer>
           </UserRegistrationProvider>

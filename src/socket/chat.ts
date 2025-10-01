@@ -4,7 +4,7 @@ export interface User {
   lastName: string;
   countryCode: string;
   contactNo: string;
-  profileImage?: string;
+  profileImage?: string; // Avatar URL from placeholder service
   createdAt: string;
   updatedAt: string;
   status: string;
