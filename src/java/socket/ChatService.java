@@ -3,6 +3,7 @@ package socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import entity.Chat;
+import entity.FriendList;
 import entity.Status;
 import entity.User;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class ChatService {
     // THREAD-SAFE SESSION MANAGEMENT
     private static final ConcurrentHashMap<Integer, Session> SESSIONS = new ConcurrentHashMap<>();
     private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-    private static final String URL = "https://32a4b8b4e421.ngrok-free.app";
+    public static final String URL = "https://8919e2c94951.ngrok-free.app";
 
     public static void register(int userId, Session session) {
         SESSIONS.put(userId, session);
@@ -179,12 +180,17 @@ public class ChatService {
     private static int getUnreadMessageCount(org.hibernate.Session session, int userId, int partnerId) {
         try {
             Criteria criteria = session.createCriteria(Chat.class);
-            criteria.add(Restrictions.eq("from.id", partnerId));
-            criteria.add(Restrictions.eq("to.id", userId));
+            criteria.createAlias("from", "f");
+            criteria.createAlias("to", "t");
+
+            criteria.add(Restrictions.eq("f.id", partnerId));   // partner sent
+            criteria.add(Restrictions.eq("t.id", userId));      // I received
             criteria.add(Restrictions.ne("status", Status.READ));
+
             criteria.setProjection(Projections.rowCount());
 
             Long count = (Long) criteria.uniqueResult();
+            System.out.println("unread count: " + count);
             return count != null ? count.intValue() : 0;
         } catch (Exception e) {
             System.out.println("Error counting unread messages from " + partnerId + " to " + userId + ": " + e.getMessage());
@@ -290,6 +296,22 @@ public class ChatService {
 
             User me = (User) session.get(User.class, userId);
             User friend = (User) session.get(User.class, friendId);
+
+            //Adding as active friends when starting a chat
+            Criteria c1 = session.createCriteria(FriendList.class);
+            c1.add(Restrictions.and(
+                    Restrictions.eq("userId", me),
+                    Restrictions.eq("friendId", friend)
+            ));
+            FriendList fl1 = (FriendList) c1.uniqueResult();
+            if (fl1 == null) {
+                FriendList friend1 = new FriendList();
+                friend1.setFriendId(friend);
+                friend1.setUserId(me);
+                friend1.setStatus(Status.ACTIVE);
+                session.save(friend1);
+                System.out.println(friendId + " Added as friend");
+            }
 
             if (me == null || friend == null) {
                 System.out.println("Invalid users: me=" + userId + ", friend=" + friendId);

@@ -137,12 +137,27 @@ public class ChatEndPoint {
                     handleFriendData(map, userId);
                     break;
 
+                case "get_all_users":
+                    handleGetAllUsers(map, userId);
+                    break;
+
                 default:
                     System.out.println("Unknown message type: " + type + " from user " + userId);
             }
 
         } catch (Exception e) {
             System.out.println("Error processing message from user " + userId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleGetAllUsers(Map< String, Object> map, int userId) {
+        try {
+            System.out.println("Getting all users");
+            Map<String, Object> envelope = UserService.getAllUsers(userId);
+            ChatService.sendToUser(userId, envelope);
+        } catch (Exception e) {
+            System.out.println("Error getting all users");
             e.printStackTrace();
         }
     }
@@ -249,9 +264,6 @@ public class ChatEndPoint {
         throw new IllegalArgumentException("Cannot convert to int: " + value);
     }
 
-    /**
-     * Get the user ID associated with a session
-     */
     public static Integer getUserIdFromSession(Session session) {
         return sessionUserMap.get(session);
     }

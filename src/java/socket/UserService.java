@@ -1,9 +1,14 @@
 package socket;
 
+import dto.UserDTO;
 import entity.Chat;
 import entity.FriendList;
 import entity.Status;
 import entity.User;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -266,5 +271,59 @@ public class UserService {
                 session.close();
             }
         }
+    }
+
+    public static Map<String, Object> getAllUsers(int userId) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+
+            Criteria c1 = session.createCriteria(User.class);
+            List<User> users = c1.list();
+
+            Map<String, Object> map = new HashMap();
+            List<UserDTO> UserDTO = new ArrayList<>();
+
+            for (User user : users) {
+                Criteria c2 = session.createCriteria(FriendList.class);
+                c2.add(Restrictions.and(
+                        Restrictions.eq("friendId.id", user.getId()), // match by friend's id
+                        Restrictions.eq("userId.id", userId), // correct field name
+                        Restrictions.ne("status", Status.BLOCKED)
+                ));
+                FriendList fl = (FriendList) c2.uniqueResult();
+                
+                UserDTO dto = new UserDTO();
+                dto.setId(user.getId());
+                dto.setFirstName(user.getFirstName());
+                dto.setLastName(user.getLastName());
+                dto.setCountryCode(user.getCountryCode());
+                dto.setContactNo(user.getContactNo());
+                dto.setProfileImage(ProfileService.getProfileUrl(userId));
+                dto.setCreatedAt(user.getCreatedAt());
+                dto.setUpdatedAt(user.getUpdatedAt());
+                dto.setStatus(user.getStatus());
+                
+                UserDTO.add(dto);
+
+                if (fl != null) {
+                    user.setStatus(Status.ACTIVE);
+                }
+
+            }
+
+            map.put("type", "get_all_users");
+            map.put("payload", UserDTO);
+            return map;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Error in getting all users" + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }
