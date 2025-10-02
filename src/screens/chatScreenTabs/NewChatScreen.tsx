@@ -73,7 +73,7 @@ export default function NewChatScreen() {
             ),
             headerRight: () => (
                 <View className="flex-row gap-2">
-                    <TouchableOpacity className="p-2 rounded-full active:bg-gray-100" activeOpacity={0.7}>
+                    <TouchableOpacity className="p-2 rounded-full active:bg-gray-100" activeOpacity={0.7} onPress={() => { navigation.navigate("NewContactScreen"); }}>
                         <Ionicons name="person-add" size={22} color="#374151" />
                     </TouchableOpacity>
                     <TouchableOpacity className="p-2 rounded-full active:bg-gray-100" activeOpacity={0.7}>

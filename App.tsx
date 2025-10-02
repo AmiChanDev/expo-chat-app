@@ -9,6 +9,7 @@ import AvatarScreen from "./src/screens/AvatarScreen";
 import SignInScreen from "./src/screens/SignInScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import HomeTabs from "./src/screens/HomeTabs";
+import NewContactScreen from "./src/screens/NewContactScreen";
 
 // Chat Screen Tabs
 import HomeScreen from "./src/screens/ChatScreenTabs/HomeScreen";
@@ -24,9 +25,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { ThemeProvider } from "./src/theme/themeProvider";
 import { UserRegistrationProvider } from "./src/components/UserContext";
 import { AlertNotificationRoot } from "react-native-alert-notification";
+import { useState } from "react";
 
 import { WebSocketProvider } from "./src/socket/WebSocketProvider";
-import { useState } from "react";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -46,8 +47,8 @@ export type RootStackParamList = {
     lastSeenTime: string;
     profileImage: string;
   };
-
   NewChatScreen: undefined;
+  NewContactScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -84,7 +85,9 @@ export default function App() {
 
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="NewChatScreen" component={NewChatScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="NewChatScreen" component={NewChatScreen} options={{ headerShown: true }} />
+
+                <Stack.Screen name="NewContactScreen" component={NewContactScreen} options={{ headerShown: true }} />
               </Stack.Navigator>
             </NavigationContainer>
           </UserRegistrationProvider>

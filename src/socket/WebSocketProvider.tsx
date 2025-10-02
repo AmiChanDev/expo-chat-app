@@ -48,7 +48,7 @@ export const WebSocketProvider: React.FC<{
                 setConnected(false)
             }
 
-            // Removed onmessage here to avoid conflicts with useChatList
+            // Removed onmessage here 
         } else {
             console.log('No valid userId, not connecting WebSocket');
             setConnected(false);
