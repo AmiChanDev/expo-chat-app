@@ -1,5 +1,5 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import { Pressable, Text, TouchableOpacity, View, Alert, ScrollView } from "react-native";
 import { RootStackParamList } from "../../App";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -17,28 +17,24 @@ export default function NewContactScreen() {
     const navigation = useNavigation<NewContactScreenProps>();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [displayName, setdisplayName] = useState("");
     const [phoneNo, setPhoneNo] = useState("");
+    const [callingCode, setCallingCode] = useState('+94');
     const [countryCode, setCountryCode] = useState<CountryCode>('LK');
     const [country, setCountry] = useState<Country | null>(null);
-    const [callingCode, setCallingCode] = useState('+94');
     const [showCountryPicker, setShowCountryPicker] = useState(false);
 
     const newContact = useSendNewContact();
     const sendNewContact = newContact.sendNewContact;
     const responseText = newContact.responseText;
+    const responseStatus = newContact.responseStatus;
 
     const sendData = () => {
-        if (firstName === "") {
+        if (displayName === "") {
             Toast.show({
                 type: ALERT_TYPE.DANGER,
                 title: "Error",
-                textBody: "Please enter first name",
-            });
-        } else if (lastName === "") {
-            Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: "Error",
-                textBody: "Please enter last name",
+                textBody: "Please enter display name",
             });
         } else if (phoneNo === "") {
             Toast.show({
@@ -46,26 +42,41 @@ export default function NewContactScreen() {
                 title: "Error",
                 textBody: "Please enter phone number",
             });
-
         } else {
             console.log("Saving new contact...");
             sendNewContact({
                 id: 0,
                 firstName: firstName,
                 lastName: lastName,
+                displayName: displayName,
                 countryCode: callingCode,
                 contactNo: phoneNo,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 status: "ACTIVE",
             });
-            setFirstName("");
-            setLastName("");
-            setCallingCode("")
+            setdisplayName("");
             setPhoneNo("");
         }
-
     };
+
+    useEffect(() => {
+        if (responseStatus !== null) {
+            if (responseStatus) {
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Success",
+                    textBody: responseText || "Contact saved successfully",
+                });
+            } else {
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: "Error",
+                    textBody: responseText || "Failed to save contact",
+                });
+            }
+        }
+    }, [responseStatus, responseText]);
 
     const onCountrySelect = (selectedCountry: Country) => {
         setCountryCode(selectedCountry.cca2);
@@ -124,35 +135,12 @@ export default function NewContactScreen() {
 
                 {/* Form Fields */}
                 <View className="px-4 py-6 space-y-4">
-                    {/* First Name */}
+                    {/* displayName */}
                     <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                         <FloatingLabelInput
-                            label="First Name"
-                            value={firstName}
-                            onChangeText={setFirstName}
-                            containerStyles={{
-                                borderWidth: 0,
-                                paddingHorizontal: 0,
-                                backgroundColor: 'transparent'
-                            }}
-                            inputStyles={{
-                                fontSize: 16,
-                                color: '#374151'
-
-                            }}
-                            labelStyles={{
-                                fontSize: 14,
-                                color: '#6b7280'
-                            }}
-                        />
-                    </View>
-
-                    {/* Last Name */}
-                    <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                        <FloatingLabelInput
-                            label="Last Name"
-                            value={lastName}
-                            onChangeText={setLastName}
+                            label="Display Name"
+                            value={displayName}
+                            onChangeText={setdisplayName}
                             containerStyles={{
                                 borderWidth: 0,
                                 paddingHorizontal: 0,
@@ -265,5 +253,4 @@ export default function NewContactScreen() {
             </SafeAreaView>
         </SafeAreaView>
     );
-
 }

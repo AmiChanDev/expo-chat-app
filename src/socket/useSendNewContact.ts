@@ -5,6 +5,7 @@ import { useWebSocket } from "./WebSocketProvider";
 export function useSendNewContact() {
   const { sendMessage, socket } = useWebSocket();
   const [responseText, setResponseText] = useState("");
+  const [responseStatus, setResponseStatus] = useState<boolean | null>(null);
 
   const sendNewContact = (user: User) => {
     sendMessage({ type: "save_new_contact", user });
@@ -18,9 +19,9 @@ export function useSendNewContact() {
     const onMessage = (event: MessageEvent) => {
       const response: WSResponse = JSON.parse(event.data);
       if (response.type === "new_contact_response_text") {
-        console.log("New Contact Saved");
-        console.log(response.payload);
-        setResponseText(response.payload);
+        console.log(response.payload.message);
+        setResponseStatus(response.payload.responseStatus);
+        setResponseText(response.payload.message);
       }
     };
 
@@ -30,5 +31,5 @@ export function useSendNewContact() {
     };
   }, [socket]);
 
-  return { sendNewContact, responseText };
+  return { sendNewContact, responseText, responseStatus };
 }
