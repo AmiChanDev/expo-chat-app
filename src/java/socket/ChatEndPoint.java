@@ -1,6 +1,7 @@
 package socket;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import entity.Chat;
 import entity.Status;
 import entity.User;
@@ -109,6 +110,7 @@ public class ChatEndPoint {
 
         try {
             Map<String, Object> map = GSON.fromJson(message, Map.class);
+            LinkedTreeMap userObject = (LinkedTreeMap) map.get("user");
             String type = (String) map.get("type");
 
             if (type == null) {
@@ -141,6 +143,10 @@ public class ChatEndPoint {
                     handleGetAllUsers(map, userId);
                     break;
 
+                case "save_new_contact":
+                    handleSaveContact(userObject, userId);
+                    break;
+
                 default:
                     System.out.println("Unknown message type: " + type + " from user " + userId);
             }
@@ -149,6 +155,12 @@ public class ChatEndPoint {
             System.out.println("Error processing message from user " + userId + ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void handleSaveContact(LinkedTreeMap userObject, int userId) {
+        System.out.println(userObject);
+        Map<String, Object> envelope = UserService.saveNewContact(userId, userObject);
+        ChatService.sendToUser(userId, envelope);
     }
 
     private void handleGetAllUsers(Map< String, Object> map, int userId) {

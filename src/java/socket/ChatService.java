@@ -29,7 +29,7 @@ public class ChatService {
     // THREAD-SAFE SESSION MANAGEMENT
     private static final ConcurrentHashMap<Integer, Session> SESSIONS = new ConcurrentHashMap<>();
     private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-    public static final String URL = "https://8919e2c94951.ngrok-free.app";
+    public static final String URL = "https://1e8097d8e88d.ngrok-free.app";
 
     public static void register(int userId, Session session) {
         SESSIONS.put(userId, session);

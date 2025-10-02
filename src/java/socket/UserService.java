@@ -1,19 +1,19 @@
 package socket;
 
+import com.google.gson.JsonObject;
+import com.google.gson.internal.LinkedTreeMap;
 import dto.UserDTO;
 import entity.Chat;
 import entity.FriendList;
 import entity.Status;
 import entity.User;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
@@ -294,7 +294,7 @@ public class UserService {
                         Restrictions.ne("status", Status.BLOCKED)
                 ));
                 FriendList fl = (FriendList) c2.uniqueResult();
-                
+
                 UserDTO dto = new UserDTO();
                 dto.setId(user.getId());
                 dto.setFirstName(user.getFirstName());
@@ -305,7 +305,7 @@ public class UserService {
                 dto.setCreatedAt(user.getCreatedAt());
                 dto.setUpdatedAt(user.getUpdatedAt());
                 dto.setStatus(user.getStatus());
-                
+
                 UserDTO.add(dto);
 
                 if (fl != null) {
@@ -324,6 +324,83 @@ public class UserService {
             System.out.println("Error in getting all users" + e.getMessage());
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public static Map<String, Object> saveNewContact(int myId, LinkedTreeMap userObject) {
+        Session session = null;
+        Transaction tx = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+
+            JsonObject responseObject = new JsonObject();
+            responseObject.addProperty("responseStatus", Boolean.FALSE);
+
+            // Get friend by contact number 
+            Criteria c1 = session.createCriteria(User.class);
+            c1.add(Restrictions.eq("contactNo", userObject.get("contactNo")));
+            User friendUser = (User) c1.uniqueResult();
+
+            if (friendUser == null) {
+                responseObject.addProperty("message", "This user is not on this app");
+            } else {
+                // Check if they are already friends 
+                Criteria c2 = session.createCriteria(FriendList.class);
+                c2.add(Restrictions.eq("userId.id", myId));
+                c2.add(Restrictions.eq("friendId.id", friendUser.getId()));
+
+                FriendList existingFriendship = (FriendList) c2.uniqueResult();
+
+                if (existingFriendship != null) {
+                          responseObject.addProperty("responseStatus", Boolean.FALSE);
+                    responseObject.addProperty("message", "This user is already your friend");
+                } else {
+                    // Get current user using Criteria
+                    Criteria c3 = session.createCriteria(User.class);
+                    c3.add(Restrictions.eq("id", myId));
+                    User currentUser = (User) c3.uniqueResult();
+
+                    if (currentUser != null) {
+                        // Create new friendship
+                        FriendList newFriend = new FriendList();
+                        newFriend.setUserId(currentUser);
+                        newFriend.setFriendId(friendUser);
+                        // Set display name
+                        newFriend.setDisplayName(String.valueOf(userObject.get("displayName")));
+                        
+                        session.save(newFriend);
+
+                        responseObject.addProperty("responseStatus", Boolean.TRUE);
+                        responseObject.addProperty("message", "User added as friend");
+                    } else {
+                              responseObject.addProperty("responseStatus", Boolean.FALSE);
+                        responseObject.addProperty("message", "Current user not found");
+                    }
+                }
+            }
+
+            tx.commit();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "new_contact_response_text");
+            map.put("payload", responseObject);
+
+            return map;
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            System.out.println("Error in saving a contact: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
         return null;
     }
 }
