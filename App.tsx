@@ -73,7 +73,7 @@ export default function App() {
         <ThemeProvider>
           <UserRegistrationProvider>
             <NavigationContainer>
-              <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+              <Stack.Navigator initialRouteName="SettingScreen" screenOptions={{ headerShown: false }}>
 
                 {/* Testing Login */}
                 {/* <Stack.Screen name="MockLogin">
