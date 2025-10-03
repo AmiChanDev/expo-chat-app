@@ -9,6 +9,8 @@ import { RootStackParamList } from "../../../App";
 import { useChatList } from "../../socket/useChatList";
 import { useWebSocket } from "../../socket/WebSocketProvider";
 import { Chat } from "../../socket/chat";
+import { useRef } from "react";
+import { Modal, Pressable } from "react-native";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">
 type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>
@@ -17,6 +19,7 @@ export default function HomeScreen() {
     const navigation = useNavigation<HomeScreenProps>();
     const rootNavigation = useNavigation<RootNavigationProp>();
     const [search, setSearch] = useState("");
+    const [menuVisible, setMenuVisible] = useState(false);
     const chatList = useChatList();
     const { isConnected, userId } = useWebSocket();
 
@@ -67,6 +70,7 @@ export default function HomeScreen() {
                     <TouchableOpacity
                         className="p-2 rounded-lg bg-white/80"
                         activeOpacity={0.7}
+                        onPress={() => setMenuVisible(true)}
                     >
                         <Ionicons name="ellipsis-vertical" size={22} color="#374151" />
                     </TouchableOpacity>
@@ -230,6 +234,54 @@ export default function HomeScreen() {
                     <Ionicons name="add" size={32} color="white" />
                 </TouchableOpacity>
             </View>
+
+            {/* Dropdown Menu Modal */}
+            <Modal
+                transparent
+                visible={menuVisible}
+                animationType="fade"
+                onRequestClose={() => setMenuVisible(false)}
+            >
+                <Pressable
+                    style={{ flex: 1 }}
+                    onPress={() => setMenuVisible(false)}
+                >
+                    <View
+                        style={{
+                            position: "absolute",
+                            top: 100,
+                            right: 20,
+                            backgroundColor: "white",
+                            borderRadius: 12,
+                            elevation: 5,
+                            shadowColor: "#000",
+                            shadowOpacity: 0.1,
+                            shadowRadius: 8,
+                            paddingVertical: 8,
+                            minWidth: 160,
+                        }}
+                    >
+                        <TouchableOpacity
+                            style={{ padding: 12 }}
+                            onPress={() => {
+                                setMenuVisible(false);
+                                navigation.navigate("SettingScreen");
+                            }}
+                        >
+                            <Text style={{ fontSize: 16 }}>Settings</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ padding: 12 }}
+                            onPress={() => {
+                                setMenuVisible(false);
+                                rootNavigation.navigate("ProfileScreen");
+                            }}
+                        >
+                            <Text style={{ fontSize: 16 }}>My Profile</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Pressable>
+            </Modal>
         </SafeAreaView>
     );
 }

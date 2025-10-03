@@ -28,6 +28,7 @@ import { AlertNotificationRoot } from "react-native-alert-notification";
 import { useState } from "react";
 
 import { WebSocketProvider } from "./src/socket/WebSocketProvider";
+import { useWebSocketPing } from "./src/socket/useWebSocketPing";
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -55,6 +56,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 //this page has all the screens and navigation between them
 //ChatScreenTabs has 3 tabs: Home, Status, Calls
 //HomeScreen has 3 tabs in one page: Home,newChat,Settings
+function ChatApp() {
+  useWebSocketPing();
+  return null;
+}
 
 export default function App() {
 
@@ -64,10 +69,11 @@ export default function App() {
     <AlertNotificationRoot>
 
       <WebSocketProvider userId={userId ?? 0}>
+        <ChatApp />
         <ThemeProvider>
           <UserRegistrationProvider>
             <NavigationContainer>
-              <Stack.Navigator initialRouteName="HomeTabs" screenOptions={{ headerShown: false }}>
+              <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
 
                 {/* Testing Login */}
                 {/* <Stack.Screen name="MockLogin">
@@ -75,10 +81,12 @@ export default function App() {
                 </Stack.Screen> */}
 
                 <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="ContactScreen" component={ContactScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="AvatarScreen" component={AvatarScreen} options={{ headerShown: false }} />
+
                 <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
+
                 <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
                 <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />

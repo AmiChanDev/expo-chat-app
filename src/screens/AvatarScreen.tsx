@@ -1,7 +1,7 @@
 import { ActivityIndicator, FlatList, Image, Pressable, StatusBar, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,10 +10,13 @@ import { useUserRegistration } from "../components/UserContext";
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 import { createNewAccount } from "../api/UserService";
+import { AuthContext } from "./serviceScreens/authProvider";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
 export default function AvatarScreen() {
+    const auth = useContext(AuthContext);
+
     const navigation = useNavigation<AvatarScreenProps>();
     const [loading, setLoading] = useState(false);
 
@@ -50,9 +53,12 @@ export default function AvatarScreen() {
 
     const handleAvatarSelect = (avatarSrc: number) => {
         setImage(avatarSrc);
+        // Find the avatar ID from the source
+        const avatarItem = avatar.find(item => item.src === avatarSrc);
+        const avatarId = avatarItem ? `avatar_${avatarItem.id}` : 'avatar_1';
         setUserData((previous) => ({
             ...previous,
-            profileImage: avatarSrc.toString()
+            profileImage: avatarId
         }));
     };
 
@@ -70,6 +76,16 @@ export default function AvatarScreen() {
                 type: ALERT_TYPE.WARNING,
                 title: "Warning",
                 textBody: "Select a profile image or an avatar"
+            });
+            return;
+        }
+
+        // Validate all required fields
+        if (!userData.firstName || !userData.lastName || !userData.contactNo || !userData.countryCode) {
+            Toast.show({
+                type: ALERT_TYPE.WARNING,
+                title: "Warning",
+                textBody: "Please fill in all required information from previous screens"
             });
             return;
         }
@@ -96,50 +112,47 @@ export default function AvatarScreen() {
             return;
         }
 
-        // console.log("User Data:", userData);
-
-        // API
-        setLoading(true);
-        {
-            loading ? (
-                <View className="w-full h-14 justify-center items-center">
-                    <ActivityIndicator size="large" color="#2563eb" />
-                </View>
-            ) : (
-                <Pressable
-                    className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
-                    onPress={handleCreateAccount}
-                >
-                    <Text className="text-white font-bold text-lg">Create Account</Text>
-                </Pressable>
-            )
-        }
-
         try {
             setLoading(true);
+            console.log("=== Creating Account Debug Info ===");
+            console.log("User Data:", JSON.stringify(userData, null, 2));
+            console.log("Selected Image:", image);
+            console.log("API URL:", process.env.EXPO_PUBLIC_APP_URL + "/ChatApp");
+
             const response = await createNewAccount(userData);
-            if (response.status) {
+            console.log("=== API Response ===");
+            console.log(JSON.stringify(response, null, 2));
+
+            if (response && response.status) {
                 Toast.show({
                     type: ALERT_TYPE.SUCCESS,
                     title: "Success",
                     textBody: response.message
                 })
-                navigation.replace("HomeScreen")
+                if (auth) {
+                    await auth.signUp(response.data.userId.toString());
+                }
+                console.log("Profile setup completed");
+                navigation.replace("HomeTabs")
             } else {
                 Toast.show({
                     type: ALERT_TYPE.WARNING,
                     title: "Warning",
                     textBody: response.message
                 })
+                console.log("Profile setup failed:", response.message);
             }
 
         } catch (error) {
-            console.log(error)
+            console.log("Error creating account:", error);
+            Toast.show({
+                type: ALERT_TYPE.WARNING,
+                title: "Error",
+                textBody: "An error occurred while creating your account. Please try again."
+            });
         } finally {
-            console.log("Profile setup completed");
             setLoading(false);
         }
-
     };
 
     return (
@@ -217,7 +230,7 @@ export default function AvatarScreen() {
                             onPress={handleCreateAccount}
                         >
                             {loading ? (
-                                <ActivityIndicator size={'large'} color={'red'} />
+                                <ActivityIndicator size={'large'} color={'white'} />
                             ) : (
                                 <Text className="text-white font-bold text-lg">Create Account</Text>
                             )}
