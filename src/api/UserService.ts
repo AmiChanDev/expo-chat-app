@@ -1,7 +1,4 @@
-import {
-  useUserRegistration,
-  UserRegistrationData,
-} from "../components/UserContext";
+import { UserRegistrationData } from "../components/UserContext";
 
 const API = process.env.EXPO_PUBLIC_APP_URL + "/ChatApp";
 
@@ -71,5 +68,20 @@ export const createNewAccount = async (
       message:
         "Network error. Please check your internet connection and try again.",
     };
+  }
+};
+
+export const uploadProfileImage = async (imageUri: string) => {
+  let formData = new FormData();
+  formData.append("profileImage", imageUri);
+  const response = await fetch(API + "/ChatApp/ProfileController", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (response.ok) {
+    return await response.json();
+  } else {
+    console.warn("Profile image uploading failed");
   }
 };
