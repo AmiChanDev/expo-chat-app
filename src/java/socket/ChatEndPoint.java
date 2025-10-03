@@ -5,6 +5,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import entity.Chat;
 import entity.Status;
 import entity.User;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -147,6 +148,9 @@ public class ChatEndPoint {
                     handleSaveContact(userObject, userId);
                     break;
 
+                case "ping":
+                    handlePingPong(userId);
+                    break;
                 default:
                     System.out.println("Unknown message type: " + type + " from user " + userId);
             }
@@ -155,6 +159,14 @@ public class ChatEndPoint {
             System.out.println("Error processing message from user " + userId + ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void handlePingPong(int userId) {
+        System.out.println("PING PONG");
+        HashMap<String, Object> envelope = new HashMap();
+        envelope.put("type", "PONG");
+        envelope.put("payload", "PONG");
+        ChatService.sendToUser(userId, envelope);
     }
 
     private void handleSaveContact(LinkedTreeMap userObject, int userId) {

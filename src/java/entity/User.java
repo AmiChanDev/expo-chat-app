@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.Date;
 import javax.persistence.*;
 
 @Entity
@@ -9,11 +10,22 @@ public class User extends BaseEntity {
     public User() {
     }
 
+//    public User(String firstName, String lastName, String countryCode, String contactNo, Date createdAt, Date updatedAt) {
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.countryCode = countryCode;
+//        this.contactNo = contactNo;
+//        this.setCreatedAt(createdAt);
+//        this.setUpdatedAt(updatedAt);
+//    }
     public User(String firstName, String lastName, String countryCode, String contactNo) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.countryCode = countryCode;
         this.contactNo = contactNo;
+        Date now = new Date();
+        setCreatedAt(now);
+        setUpdatedAt(now);
     }
 
     @Id

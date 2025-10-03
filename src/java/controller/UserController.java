@@ -69,6 +69,8 @@ public class UserController extends HttpServlet {
                 } else {
                     user = new User(firstName, lastName, countryCode, contactNo);
                     Integer id = (Integer) session.save(user);
+
+//                    save
                     tx.commit();
 
                     responseObject.add("user", gson.toJsonTree(user));
