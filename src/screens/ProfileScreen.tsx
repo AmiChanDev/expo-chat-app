@@ -13,6 +13,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserRegistration } from "../components/UserContext";
 import { useTheme } from "../theme/themeProvider";
+import { uploadProfileImage } from "../api/UserService";
+import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 export default function ProfileScreen() {
     const { userData, setUserData } = useUserRegistration();
@@ -70,10 +72,14 @@ export default function ProfileScreen() {
         });
 
         if (!result.canceled && result.assets[0]) {
+            const imageUri = result.assets[0].uri;
             setUserData(prev => ({
                 ...prev,
-                profileImage: result.assets[0].uri,
+                profileImage: imageUri,
             }));
+
+            // Upload the image to server
+            await handleImageUpload(imageUri);
         }
     };
 
@@ -86,10 +92,51 @@ export default function ProfileScreen() {
         });
 
         if (!result.canceled && result.assets[0]) {
+            const imageUri = result.assets[0].uri;
             setUserData(prev => ({
                 ...prev,
-                profileImage: result.assets[0].uri,
+                profileImage: imageUri,
             }));
+
+            // Upload the image to server
+            await handleImageUpload(imageUri);
+        }
+    };
+
+    const handleImageUpload = async (imageUri: string) => {
+        try {
+            Toast.show({
+                type: ALERT_TYPE.INFO,
+                title: "Uploading",
+                textBody: "Uploading profile image...",
+                autoClose: 2000,
+            });
+
+            const response = await uploadProfileImage(imageUri);
+
+            if (response && response.status) {
+                Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Success",
+                    textBody: "Profile image updated successfully!",
+                    autoClose: 3000,
+                });
+            } else {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "Upload Failed",
+                    textBody: response?.message || "Failed to upload image",
+                    autoClose: 3000,
+                });
+            }
+        } catch (error) {
+            console.error("Error uploading profile image:", error);
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: "Error",
+                textBody: "An error occurred while uploading the image",
+                autoClose: 3000,
+            });
         }
     };
 

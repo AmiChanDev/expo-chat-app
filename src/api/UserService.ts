@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import { UserRegistrationData } from "../components/UserContext";
+import { AuthContext } from "../socket/authProvider";
 
 const API = process.env.EXPO_PUBLIC_APP_URL + "/ChatApp";
 
@@ -72,16 +74,48 @@ export const createNewAccount = async (
 };
 
 export const uploadProfileImage = async (imageUri: string) => {
-  let formData = new FormData();
-  formData.append("profileImage", imageUri);
-  const response = await fetch(API + "/ChatApp/ProfileController", {
-    method: "POST",
-    body: formData,
-  });
+  const auth = useContext(AuthContext);
 
-  if (response.ok) {
-    return await response.json();
-  } else {
-    console.warn("Profile image uploading failed");
+  if (!auth || !auth.userId) {
+    console.warn("No authenticated user found");
+    return {
+      status: false,
+      message: "User not authenticated",
+    };
+  }
+
+  const formData = new FormData();
+  formData.append("userId", auth.userId);
+  formData.append("profileImage", {
+    uri: imageUri,
+    name: "profile.jpg",
+    type: "image/jpeg",
+  } as any);
+
+  try {
+    const response = await fetch(API + "/ProfileController", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      console.log("Profile image upload successful:", json);
+      return json;
+    } else {
+      const errorText = await response.text();
+      console.log("Profile image upload failed:", response.status, errorText);
+      return {
+        status: false,
+        message: `Upload failed: ${response.status}. ${errorText || "Please try again."}`,
+      };
+    }
+  } catch (error) {
+    console.error("Network error during profile image upload:", error);
+    return {
+      status: false,
+      message:
+        "Network error. Please check your internet connection and try again.",
+    };
   }
 };
