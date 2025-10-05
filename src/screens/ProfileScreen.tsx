@@ -99,7 +99,7 @@ export default function ProfileScreen() {
             }));
 
             // Upload the image to server
-            await handleImageUpload(imageUri);
+            pickImage();
         }
     };
 
