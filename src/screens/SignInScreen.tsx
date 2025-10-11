@@ -36,8 +36,6 @@ export default function SignInScreen() {
     const [country, setCountry] = useState<Country | null>(null);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [password, setPassword] = useState("");
 
     useEffect(() => {
         // Set default country code
@@ -55,40 +53,7 @@ export default function SignInScreen() {
         setIsLoading(true);
 
         try {
-            // Validate inputs
-            const fullPhoneNumber = `+${country?.callingCode?.[0] || "94"}${phoneNumber}`;
-            const validCountryCode = Validation.validateCountryCode(`+${country?.callingCode?.[0] || "94"}`);
-            const validContactNo = Validation.validatePhoneNo(phoneNumber);
-
-            if (validCountryCode) {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: "Invalid Country",
-                    textBody: validCountryCode,
-                });
-                return;
-            }
-
-            if (validContactNo) {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: "Invalid Phone Number",
-                    textBody: validContactNo,
-                });
-                return;
-            }
-
-            if (!password.trim()) {
-                Toast.show({
-                    type: ALERT_TYPE.WARNING,
-                    title: "Password Required",
-                    textBody: "Please enter your password",
-                });
-                return;
-            }
-
-            // Simulate authentication (replace with actual API call)
-            // For now, just simulate a successful login
+            // Simple login with hardcoded user ID 12
             Toast.show({
                 type: ALERT_TYPE.SUCCESS,
                 title: "Sign In Successful",
@@ -96,9 +61,8 @@ export default function SignInScreen() {
                 autoClose: 2000,
             });
 
-            // Simulate user ID (replace with actual authentication response)
-            const userId = "12345";
-            await auth?.signUp(userId);
+            // Login with user ID 12
+            await auth?.signUp("12");
 
             // Navigate to main app
             navigation.replace("HomeTabs");
@@ -107,7 +71,7 @@ export default function SignInScreen() {
             Toast.show({
                 type: ALERT_TYPE.DANGER,
                 title: "Sign In Failed",
-                textBody: "Invalid credentials. Please try again.",
+                textBody: "Something went wrong. Please try again.",
             });
         } finally {
             setIsLoading(false);
@@ -202,41 +166,6 @@ export default function SignInScreen() {
                                         </View>
                                     </View>
                                 </View>
-
-                                {/* Password Input Section */}
-                                <View>
-                                    <Text className="text-gray-700 dark:text-gray-300 font-semibold mb-3 text-base">
-                                        Password
-                                    </Text>
-                                    <View className="relative">
-                                        <TextInput
-                                            className="w-full h-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 pr-12 text-gray-700 dark:text-gray-300 font-medium text-base shadow-sm"
-                                            placeholder="Enter your password"
-                                            placeholderTextColor="#9ca3af"
-                                            value={password}
-                                            onChangeText={setPassword}
-                                            secureTextEntry={!showPassword}
-                                            autoComplete="password"
-                                        />
-                                        <TouchableOpacity
-                                            className="absolute right-4 top-0 bottom-0 justify-center"
-                                            onPress={() => setShowPassword(!showPassword)}
-                                        >
-                                            <Ionicons
-                                                name={showPassword ? "eye-off" : "eye"}
-                                                size={20}
-                                                color="#6b7280"
-                                            />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-
-                                {/* Forgot Password Link */}
-                                <TouchableOpacity className="self-end">
-                                    <Text className="text-blue-600 dark:text-blue-400 font-medium">
-                                        Forgot Password?
-                                    </Text>
-                                </TouchableOpacity>
 
                                 {/* Sign In Button */}
                                 <Pressable

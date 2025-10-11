@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { FlatList, Image, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
@@ -33,75 +32,70 @@ export default function NewChatScreen() {
         console.log(`[getProfileImageUrl] Raw profileImage: "${user.profileImage}"`);
 
         if (user.profileImage && user.profileImage.trim() !== '') {
-            // If it's already a full URL but uses localhost, replace with the correct base URL
             if (user.profileImage.startsWith('http://') || user.profileImage.startsWith('https://')) {
-                // Replace localhost URLs with the correct API base
                 if (user.profileImage.includes('localhost') || user.profileImage.includes('127.0.0.1')) {
-                    // Check if this is the wrong user's image (user ID mismatch)
                     const urlUserIdMatch = user.profileImage.match(/profile-images\/(\d+)\//);
                     if (urlUserIdMatch) {
                         const urlUserId = urlUserIdMatch[1];
                         if (urlUserId !== user.id.toString()) {
-                            console.log(`[getProfileImageUrl] URL user ID (${urlUserId}) doesn't match user ID (${user.id}), generating correct URL`);
-                            // Generate the correct URL for this specific user
                             const correctUrl = `${API_BASE}/ChatApp/profile-images/${user.id}/profile1.png`;
-                            console.log(`[getProfileImageUrl] Generated correct user-specific URL: ${correctUrl}`);
                             return correctUrl;
                         }
                     }
 
-                    // Extract the path after the port (e.g., /ChatApp/profile-images/12/profile1.png)
                     const pathMatch = user.profileImage.match(/:\d+(.*)$/);
                     if (pathMatch) {
                         const path = pathMatch[1];
                         const correctedUrl = `${API_BASE}${path}`;
-                        console.log(`[getProfileImageUrl] Replaced localhost URL: ${correctedUrl}`);
                         return correctedUrl;
                     }
                 }
-                console.log(`[getProfileImageUrl] Using full URL as-is: ${user.profileImage}`);
                 return user.profileImage;
             }
-            // If it's a relative path from the backend, prepend the API base URL
+
             if (user.profileImage.startsWith('/') || user.profileImage.includes('uploads/')) {
                 const imagePath = user.profileImage.startsWith('/') ? user.profileImage : `/${user.profileImage}`;
-                const finalUrl = `${API_BASE}${imagePath}`;
-                console.log(`[getProfileImageUrl] Constructed relative path URL: ${finalUrl}`);
-                return finalUrl;
+                return `${API_BASE}${imagePath}`;
             }
-            // If it's just a filename, construct the full path
-            const finalUrl = `${API_BASE}/ChatApp/uploads/${user.profileImage}`;
-            console.log(`[getProfileImageUrl] Constructed filename URL: ${finalUrl}`);
-            return finalUrl;
+
+            return `${API_BASE}/ChatApp/uploads/${user.profileImage}`;
         }
 
-        // Try to check if user-specific profile image exists by generating the expected URL
-        const userSpecificUrl = `${API_BASE}/ChatApp/profile-images/${user.id}/profile1.png`;
-        console.log(`[getProfileImageUrl] Trying user-specific URL: ${userSpecificUrl}`);
-
-        // For now, return fallback but we could add a check here
+        // fallback avatar if no image
         const fallbackUrl = `https://avatar.iran.liara.run/public/${user.id}`;
-        console.log(`[getProfileImageUrl] Using fallback URL: ${fallbackUrl}`);
         return fallbackUrl;
-    }; const [search, setSearch] = useState("");
+    };
+
+    // States
+    const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
 
-    // Get real users data from API/WebSocket
     const allUsers = getAllUsers();
     const [users, setUsers] = useState<User[]>([]);
 
     // Update users when allUsers changes
     useEffect(() => {
         console.log("NewChatScreen - Received users:", allUsers);
-        console.log("NewChatScreen - First user profileImage:", allUsers[0]?.profileImage);
-        if (allUsers.length > 0) {
+        console.log("NewChatScreen - allUsers is array:", Array.isArray(allUsers));
+        console.log("NewChatScreen - allUsers length:", allUsers?.length);
+
+        if (Array.isArray(allUsers)) {
             setUsers(allUsers);
             setLoading(false);
+            console.log("NewChatScreen - Loading stopped, users set:", allUsers.length);
         }
     }, [allUsers]);
 
-    // Filter users based on search query
+    // Fallback timeout
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            console.log("NewChatScreen - 5 second timeout reached, stopping loading");
+            setLoading(false);
+        }, 5000);
+        return () => clearTimeout(timeout);
+    }, []);
 
+    // Filter users
     const filteredUsers = useMemo(() => {
         if (!search.trim()) return users;
         return users.filter(user =>
@@ -110,6 +104,7 @@ export default function NewChatScreen() {
         );
     }, [users, search]);
 
+    // Header customization
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "",
@@ -150,7 +145,7 @@ export default function NewChatScreen() {
         });
     }, [navigation, filteredUsers.length, loading, isDark]);
 
-
+    // Render contact list item
     const renderContacts = ({ item }: { item: User }) => {
         const profileImageUrl = getProfileImageUrl(item);
 
@@ -158,13 +153,9 @@ export default function NewChatScreen() {
             <TouchableOpacity
                 className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl my-1 mx-1 shadow-sm`}
                 activeOpacity={0.7}
-                onPress={() => {
-                    // Navigate to chat screen with this user
-                    // navigation.navigate('SingleChatScreen', { userId: item.id, userName: `${item.firstName} ${item.lastName}` });
-                }}
             >
                 <View className="flex-row items-center p-4">
-                    {/* Avatar with online indicator */}
+                    {/* Avatar */}
                     <View className="relative mr-4">
                         <Image
                             source={{ uri: profileImageUrl }}
@@ -180,9 +171,8 @@ export default function NewChatScreen() {
                                 console.log(`Successfully loaded avatar for ${item.firstName} ${item.lastName} from:`, profileImageUrl);
                             }}
                         />
-                        {/* Online indicator - updated to handle real status values */}
-                        <View className={`absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full border-2 ${isDark ? 'border-gray-800' : 'border-white'} ${item.status === "ONLINE" || item.status === "ACTIVE" ? 'bg-green-500' : 'bg-gray-400'
-                            }`} />
+                        {/* Online indicator */}
+                        <View className={`absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full border-2 ${isDark ? 'border-gray-800' : 'border-white'} ${item.status === "ONLINE" || item.status === "ACTIVE" ? 'bg-green-500' : 'bg-gray-400'}`} />
                     </View>
 
                     {/* Contact Info */}
@@ -213,11 +203,12 @@ export default function NewChatScreen() {
                     >
                         <Ionicons name="chatbubble" size={18} color="white" />
                     </TouchableOpacity>
-                </View >
-            </TouchableOpacity >
+                </View>
+            </TouchableOpacity>
         );
     };
 
+    // Main render
     return (
         <SafeAreaView className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`} edges={["left", "right"]}>
             <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -268,11 +259,25 @@ export default function NewChatScreen() {
                                         <Ionicons name="people-outline" size={40} color={isDark ? "#6b7280" : "#9ca3af"} />
                                     </View>
                                     <Text className={`text-lg font-semibold ${isDark ? 'text-gray-200' : 'text-gray-700'} text-center mb-2`}>
-                                        No contacts found
+                                        {search ? 'No matches found' : 'No friends yet'}
                                     </Text>
-                                    <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} text-center`}>
-                                        {search ? 'Try searching with different keywords' : 'No contacts available'}
+                                    <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} text-center mb-4`}>
+                                        {search
+                                            ? 'Try searching with different keywords'
+                                            : 'Add friends to start chatting with them'}
                                     </Text>
+                                    {!search && (
+                                        <TouchableOpacity
+                                            className="bg-blue-500 px-6 py-3 rounded-full mt-2"
+                                            activeOpacity={0.8}
+                                            onPress={() => navigation.navigate("NewContactScreen")}
+                                        >
+                                            <View className="flex-row items-center">
+                                                <Ionicons name="person-add" size={18} color="white" />
+                                                <Text className="text-white font-medium ml-2">Add Friends</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    )}
                                 </>
                             )}
                         </View>

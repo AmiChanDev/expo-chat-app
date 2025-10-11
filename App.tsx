@@ -9,7 +9,7 @@ import AvatarScreen from "./src/screens/AvatarScreen";
 import SignInScreen from "./src/screens/SignInScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import HomeTabs from "./src/screens/HomeTabs";
-import NewContactScreen from "./src/screens/NewContactScreen";
+import NewContactScreen from "./src/screens/ChatScreenTabs/NewContactScreen";
 
 // Chat Screen Tabs
 import HomeScreen from "./src/screens/ChatScreenTabs/HomeScreen";

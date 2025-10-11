@@ -27,7 +27,7 @@ export const WebSocketProvider: React.FC<{
         if (userId && userId > 0) {
             console.log(`Connecting WebSocket for userId: ${userId}`);
             const wsUrl = process.env.EXPO_PUBLIC_WS_URL || 'localhost:8080';
-            const fullUrl = `ws://${wsUrl}/ChatApp/chat?userId=${userId}`;
+            const fullUrl = `wss://${wsUrl}/ChatApp/chat?userId=${userId}`;
             console.log(`WebSocket URL: ${fullUrl}`);
 
             const socket = new WebSocket(fullUrl);

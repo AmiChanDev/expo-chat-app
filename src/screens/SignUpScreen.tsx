@@ -159,7 +159,7 @@ export default function SignUpScreen() {
                             </Text>
 
                             <Pressable
-                            // onPress={() => navigation.navigate("SignInScreen")}
+                            onPress={() => navigation.navigate("SignInScreen")}
                             >
                                 <Text className="text-slate-500 text-sm">
                                     Already have an account?{" "}

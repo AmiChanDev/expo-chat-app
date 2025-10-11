@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useLayoutEffect } from "react";
 import {
     View,
     Text,
@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserRegistration } from "../../components/UserContext";
@@ -19,10 +20,99 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { AuthContext } from "../../socket/authProvider";
 
 export default function ProfileScreen() {
+    const navigation = useNavigation();
     const { userData, setUserData } = useUserRegistration();
     const { applied } = useTheme();
     const auth = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(false);
+    const isDark = applied === "dark";
+
+    // Helper function to get proper profile image URL
+    const getProfileImageUrl = (user: any) => {
+        const API_BASE = process.env.EXPO_PUBLIC_APP_URL;
+
+        console.log(`[ProfileScreen] Processing profile image for user ID: ${user.id || auth?.userId}`);
+        console.log(`[ProfileScreen] API_BASE: ${API_BASE}`);
+        console.log(`[ProfileScreen] Raw profileImage: "${user.profileImage}"`);
+
+        if (user.profileImage && user.profileImage.trim() !== '') {
+            // If it's already a full URL but uses localhost, replace with the correct base URL
+            if (user.profileImage.startsWith('http://') || user.profileImage.startsWith('https://')) {
+                // Replace localhost URLs with the correct API base
+                if (user.profileImage.includes('localhost') || user.profileImage.includes('127.0.0.1')) {
+                    // Extract the path after the port (e.g., /ChatApp/profile-images/12/profile1.png)
+                    const pathMatch = user.profileImage.match(/:\d+(.*)$/);
+                    if (pathMatch) {
+                        const path = pathMatch[1];
+                        const correctedUrl = `${API_BASE}${path}`;
+                        console.log(`[ProfileScreen] Replaced localhost URL: ${correctedUrl}`);
+                        return correctedUrl;
+                    }
+                }
+                console.log(`[ProfileScreen] Using full URL as-is: ${user.profileImage}`);
+                return user.profileImage;
+            }
+            // If it's a relative path from the backend, prepend the API base URL
+            if (user.profileImage.startsWith('/') || user.profileImage.includes('uploads/')) {
+                const imagePath = user.profileImage.startsWith('/') ? user.profileImage : `/${user.profileImage}`;
+                const finalUrl = `${API_BASE}${imagePath}`;
+                console.log(`[ProfileScreen] Constructed relative path URL: ${finalUrl}`);
+                return finalUrl;
+            }
+            // If it's just a filename, construct the full path
+            const finalUrl = `${API_BASE}/ChatApp/uploads/${user.profileImage}`;
+            console.log(`[ProfileScreen] Constructed filename URL: ${finalUrl}`);
+            return finalUrl;
+        }
+
+        // Try to check if user-specific profile image exists by generating the expected URL
+        const userId = user.id || auth?.userId;
+        if (userId) {
+            const userSpecificUrl = `${API_BASE}/ChatApp/profile-images/${userId}/profile1.png`;
+            console.log(`[ProfileScreen] Trying user-specific URL: ${userSpecificUrl}`);
+            return userSpecificUrl;
+        }
+
+        console.log(`[ProfileScreen] No profile image available`);
+        return null;
+    };
+
+    // Configure header
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Profile",
+            headerTitleStyle: {
+                fontWeight: "bold",
+                fontSize: 20,
+                color: applied === "dark" ? "#f8fafc" : "#1f2937"
+            },
+            headerStyle: {
+                backgroundColor: applied === "dark" ? "#1f2937" : "#f8fafc",
+            },
+            headerLeft: () => (
+                <View className="flex-row items-center">
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        className={`mr-4 p-2 rounded-full ${isDark ? 'active:bg-gray-700' : 'active:bg-gray-100'}`}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="arrow-back" size={24} color={isDark ? "#f9fafb" : "#374151"} />
+                    </TouchableOpacity>
+
+                </View>
+            ),
+            headerRight: () => (
+                <View className="flex-row gap-2 mr-4">
+                    <TouchableOpacity
+                        className={`p-2 rounded-full ${isDark ? 'active:bg-gray-700' : 'active:bg-gray-100'}`}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="settings-outline" size={22} color={isDark ? "#f9fafb" : "#374151"} />
+                    </TouchableOpacity>
+                </View>
+            ),
+        });
+    }, [navigation, isDark]);
 
     // Fetch user details when component mounts or when userId changes
     useEffect(() => {
@@ -173,13 +263,28 @@ export default function ProfileScreen() {
             const response = await uploadProfileImage(imageUri, auth.userId);
 
             if (response && response.status) {
-                // Toast.show({
-                //     type: ALERT_TYPE.SUCCESS,
-                //     title: "Success",
-                //     textBody: "Profile image updated successfully!",
-                //     autoClose: 3000,
-                // });
-                console.log("User profile loaded")
+                console.log("Profile image uploaded successfully, refreshing user data...");
+
+                // Refresh user details to get the updated profile image URL
+                const userResponse = await getUserDetails(auth.userId);
+                if (userResponse.status && userResponse.data) {
+                    console.log("Updated user details fetched:", userResponse.data);
+                    setUserData(userResponse.data);
+
+                    Toast.show({
+                        type: ALERT_TYPE.SUCCESS,
+                        title: "Success",
+                        textBody: "Profile image updated successfully!",
+                        autoClose: 3000,
+                    });
+                } else {
+                    console.warn("Failed to fetch updated user details after upload");
+                    // Keep the local image URI as fallback
+                    setUserData(prev => ({
+                        ...prev,
+                        profileImage: imageUri,
+                    }));
+                }
             } else {
                 Toast.show({
                     type: ALERT_TYPE.WARNING,
@@ -187,6 +292,12 @@ export default function ProfileScreen() {
                     textBody: response?.message || "Failed to upload image",
                     autoClose: 3000,
                 });
+
+                // Reset the local image since upload failed
+                setUserData(prev => ({
+                    ...prev,
+                    profileImage: prev.profileImage === imageUri ? null : prev.profileImage,
+                }));
             }
         } catch (error) {
             console.error("Error uploading profile image:", error);
@@ -196,10 +307,14 @@ export default function ProfileScreen() {
                 textBody: "An error occurred while uploading the image",
                 autoClose: 3000,
             });
+
+            // Reset the local image since upload failed
+            setUserData(prev => ({
+                ...prev,
+                profileImage: prev.profileImage === imageUri ? null : prev.profileImage,
+            }));
         }
     };
-
-    const isDark = applied === "dark";
 
     return (
         <SafeAreaView
@@ -239,27 +354,43 @@ export default function ProfileScreen() {
                 {!isLoading && auth?.userId && (
                     <>
                         {/* Beautiful Header Section - Inspired by SettingsScreen */}
-                        <View className="mb-8">
+                        <View className="mb-4">
                             {/* Profile Image Container */}
                             <TouchableOpacity
                                 onPress={pickImage}
                                 className="relative self-center mb-4"
                                 activeOpacity={0.8}
                             >
-                                <View className={`w-24 h-24 rounded-full ${isDark ? "bg-blue-600" : "bg-blue-500"} justify-center items-center shadow-lg overflow-hidden border-4 border-white`}>
-                                    {userData.profileImage ? (
-                                        <Image
-                                            source={{ uri: userData.profileImage }}
-                                            className="w-full h-full"
-                                            resizeMode="cover"
-                                        />
-                                    ) : (
-                                        <Ionicons
-                                            name="person"
-                                            size={40}
-                                            color="white"
-                                        />
-                                    )}
+                                <View className={`w-36 h-36 rounded-full ${isDark ? "bg-blue-600" : "bg-blue-500"} justify-center items-center shadow-lg overflow-hidden border-4 border-white`}>
+                                    {(() => {
+                                        const profileImageUrl = getProfileImageUrl(userData);
+                                        console.log(`[ProfileScreen] Displaying image URL: ${profileImageUrl}`);
+
+                                        return profileImageUrl ? (
+                                            <Image
+                                                source={{
+                                                    uri: `${profileImageUrl}?t=${Date.now()}` // Add cache busting
+                                                }}
+                                                className="w-full h-full"
+                                                resizeMode="cover"
+                                                onError={(error) => {
+                                                    console.log(`[ProfileScreen] Failed to load profile image`);
+                                                    console.log('Original profileImage:', userData.profileImage);
+                                                    console.log('Attempted URL:', profileImageUrl);
+                                                    console.log('Error:', error.nativeEvent.error);
+                                                }}
+                                                onLoad={() => {
+                                                    console.log(`[ProfileScreen] Successfully loaded profile image from:`, profileImageUrl);
+                                                }}
+                                            />
+                                        ) : (
+                                            <Ionicons
+                                                name="person"
+                                                size={40}
+                                                color="white"
+                                            />
+                                        );
+                                    })()}
                                 </View>
 
                                 {/* Camera Icon Overlay */}
