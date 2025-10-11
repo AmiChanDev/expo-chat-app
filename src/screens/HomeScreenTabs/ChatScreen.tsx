@@ -5,6 +5,7 @@ import SettingScreen from "../ChatScreenTabs/SettingScreen";
 import NewChatScreen from "../ChatScreenTabs/NewChatScreen";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
+import { useTheme } from "../../theme/themeProvider";
 
 export type ChatStackParamList = {
   HomeScreen: undefined;
@@ -17,6 +18,29 @@ const Stack = createNativeStackNavigator();
 
 export default function ChatScreen() {
   const navigation = useNavigation();
+  const { applied } = useTheme();
+
+  const getTabBarStyle = () => {
+    const isDark = applied === "dark";
+    return {
+      display: 'flex' as const,
+      height: 88,
+      backgroundColor: isDark ? "#1f2937" : "#ffffff",
+      borderTopWidth: 1,
+      borderTopColor: isDark ? "#374151" : "#f3f4f6",
+      paddingTop: 8,
+      paddingBottom: 8,
+      paddingHorizontal: 16,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: -2,
+      },
+      shadowOpacity: isDark ? 0.3 : 0.1,
+      shadowRadius: 4,
+      elevation: 8,
+    };
+  };
 
   return (
     <Stack.Navigator
@@ -35,24 +59,7 @@ export default function ChatScreen() {
           focus: () => {
             // Ensure tab bar is shown when HomeScreen is focused
             navigation.getParent()?.setOptions({
-              tabBarStyle: {
-                display: 'flex',
-                height: 88,
-                backgroundColor: "#ffffff",
-                borderTopWidth: 1,
-                borderTopColor: "#f3f4f6",
-                paddingTop: 8,
-                paddingBottom: 8,
-                paddingHorizontal: 16,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: -2,
-                },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 8,
-              }
+              tabBarStyle: getTabBarStyle()
             });
           },
         })}
@@ -73,24 +80,7 @@ export default function ChatScreen() {
           blur: () => {
             // Show tab bar when leaving SettingScreen
             navigation.getParent()?.setOptions({
-              tabBarStyle: {
-                display: 'flex',
-                height: 88,
-                backgroundColor: "#ffffff",
-                borderTopWidth: 1,
-                borderTopColor: "#f3f4f6",
-                paddingTop: 8,
-                paddingBottom: 8,
-                paddingHorizontal: 16,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: -2,
-                },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 8,
-              }
+              tabBarStyle: getTabBarStyle()
             });
           },
         })}
@@ -111,24 +101,7 @@ export default function ChatScreen() {
           blur: () => {
             // Show tab bar when leaving NewChatScreen
             navigation.getParent()?.setOptions({
-              tabBarStyle: {
-                display: 'flex',
-                height: 88,
-                backgroundColor: "#ffffff",
-                borderTopWidth: 1,
-                borderTopColor: "#f3f4f6",
-                paddingTop: 8,
-                paddingBottom: 8,
-                paddingHorizontal: 16,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: -2,
-                },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 8,
-              }
+              tabBarStyle: getTabBarStyle()
             });
           },
         })}

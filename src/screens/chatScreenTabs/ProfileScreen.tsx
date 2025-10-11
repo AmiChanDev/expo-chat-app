@@ -12,11 +12,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserRegistration } from "../components/UserContext";
-import { useTheme } from "../theme/themeProvider";
-import { uploadProfileImage, getUserDetails } from "../api/UserService";
+import { useUserRegistration } from "../../components/UserContext";
+import { useTheme } from "../../theme/themeProvider";
+import { uploadProfileImage, getUserDetails } from "../../api/UserService";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
-import { AuthContext } from "../socket/authProvider";
+import { AuthContext } from "../../socket/authProvider";
 
 export default function ProfileScreen() {
     const { userData, setUserData } = useUserRegistration();

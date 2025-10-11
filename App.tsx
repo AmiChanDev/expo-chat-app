@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //screens
 import SplashScreen from "./src/screens/SplashScreen";
-import ProfileScreen from "./src/screens/ProfileScreen";
+import ProfileScreen from "./src/screens/ChatScreenTabs/ProfileScreen";
 import ContactScreen from "./src/screens/ContactScreen";
 import AvatarScreen from "./src/screens/AvatarScreen";
 import SignInScreen from "./src/screens/SignInScreen";

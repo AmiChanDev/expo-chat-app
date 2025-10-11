@@ -9,7 +9,6 @@ import { RootStackParamList } from "../../../App";
 import { useChatList } from "../../socket/useChatList";
 import { useWebSocket } from "../../socket/WebSocketProvider";
 import { Chat } from "../../socket/chat";
-import { useRef } from "react";
 import { Modal, Pressable } from "react-native";
 import { AuthContext } from "../../socket/authProvider";
 import { useTheme } from "../../theme/themeProvider";
