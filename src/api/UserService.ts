@@ -61,7 +61,9 @@ export const createNewAccount = async (
         success: json.success !== undefined ? json.success : true,
         message: json.message || "Account created successfully",
         data: json.data || json,
-        userId: json.userId || json.data?.userId || json.id,
+        // Backend returns user object in 'user' field, extract ID from there
+        userId: json.user?.id || json.userId || json.data?.userId || json.id,
+        user: json.user,
       };
 
       console.log("Normalized response:", normalizedResponse);

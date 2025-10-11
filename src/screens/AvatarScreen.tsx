@@ -165,9 +165,18 @@ export default function AvatarScreen() {
                 if (auth) {
                     // Try different possible user ID fields safely
                     const responseAny = response as any;
-                    const userId = responseAny.data?.userId || responseAny.userId || responseAny.id;
+                    const userId = responseAny.user?.id || responseAny.userId || responseAny.data?.userId || responseAny.id;
+                    console.log("=== Sign Up Debug ===");
+                    console.log("Extracted userId:", userId);
+                    console.log("userId type:", typeof userId);
+                    console.log("Full user object:", responseAny.user);
                     if (userId) {
+                        console.log("Calling auth.signUp with:", userId.toString());
                         await auth.signUp(userId.toString());
+                        console.log("auth.signUp completed, current auth.userId:", auth.userId);
+                    } else {
+                        console.error("No userId found in response!");
+                        console.error("Available response keys:", Object.keys(responseAny));
                     }
                 }
                 console.log("Profile setup completed");

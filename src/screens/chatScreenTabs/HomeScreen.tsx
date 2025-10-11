@@ -2,7 +2,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { View, Text, TouchableOpacity, TextInput, FlatList, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ChatStackParamList } from "../HomeScreenTabs/ChatScreen";
 import { RootStackParamList } from "../../../App";
@@ -11,6 +11,7 @@ import { useWebSocket } from "../../socket/WebSocketProvider";
 import { Chat } from "../../socket/chat";
 import { useRef } from "react";
 import { Modal, Pressable } from "react-native";
+import { AuthContext } from "../../socket/authProvider";
 
 type HomeScreenProps = NativeStackNavigationProp<ChatStackParamList, "HomeScreen">
 type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>
@@ -22,6 +23,15 @@ export default function HomeScreen() {
     const [menuVisible, setMenuVisible] = useState(false);
     const chatList = useChatList();
     const { isConnected, userId } = useWebSocket();
+    const auth = useContext(AuthContext);
+
+    // Debug: Log authentication status
+    useEffect(() => {
+        console.log("=== HomeScreen Auth Debug ===");
+        console.log("Auth userId:", auth?.userId);
+        console.log("WebSocket userId:", userId);
+        console.log("WebSocket connected:", isConnected);
+    }, [auth?.userId, userId, isConnected]);
 
     // Helper function to format time
     const formatTime = (timestamp: string) => {

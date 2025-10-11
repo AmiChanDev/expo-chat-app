@@ -9,11 +9,12 @@ import Animated, {
     useAnimatedStyle,
 } from "react-native-reanimated";
 import { FloatingBubblesDesign } from "../components/SplashDesigns";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../socket/authProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type NavigationProp = NativeStackNavigationProp<
     RootStackParamList,
@@ -42,27 +43,51 @@ export default function SplashScreen() {
         const timer = setTimeout(() => {
             opacity.value = withTiming(0, { duration: 500 });
             setTimeout(() => {
-                // Check if user is authenticated
-                if (auth && !auth.isLoading) {
-                    if (auth.userId) {
-                        // User is logged in, go to HomeTabs
-                        console.log("User is authenticated, navigating to HomeTabs");
-                        navigation.replace("HomeTabs");
-                    } else {
-                        // User is not logged in, go to SignUpScreen
-                        console.log("User is not authenticated, navigating to SignUpScreen");
-                        navigation.replace("SignUpScreen");
-                    }
-                } else {
-                    // Still loading, go to SignUpScreen as fallback
-                    console.log("Auth still loading, navigating to SignUpScreen");
-                    navigation.replace("SignUpScreen");
-                }
+                handleNavigation();
             }, 500);
         }, 2000);
 
         return () => clearTimeout(timer);
-    }, [auth, navigation]);
+    }, []);
+
+    // Separate effect to handle navigation when auth state changes
+    useEffect(() => {
+        if (auth && !auth.isLoading) {
+            // Only navigate after minimum splash time (2.5 seconds)
+            const minSplashTime = 2500;
+            const elapsedTime = Date.now() - (startTime || Date.now());
+            const remainingTime = Math.max(0, minSplashTime - elapsedTime);
+
+            setTimeout(() => {
+                handleNavigation();
+            }, remainingTime);
+        }
+    }, [auth?.isLoading, auth?.userId]);
+
+    const [startTime] = useState(Date.now());
+
+    // Debug function to clear AsyncStorage (uncomment to test fresh registration)
+    // useEffect(() => {
+    //     const clearStorage = async () => {
+    //         await AsyncStorage.clear();
+    //         console.log("AsyncStorage cleared for testing");
+    //     };
+    //     clearStorage();
+    // }, []);
+
+    const handleNavigation = () => {
+        if (auth && !auth.isLoading) {
+            if (auth.userId) {
+                // User is logged in, go to HomeTabs
+                console.log("User is authenticated, navigating to HomeTabs. User ID:", auth.userId);
+                navigation.replace("HomeTabs");
+            } else {
+                // User is not logged in, go to SignUpScreen
+                console.log("User is not authenticated, navigating to SignUpScreen");
+                navigation.replace("SignUpScreen");
+            }
+        }
+    };
 
     const fadeOutStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,

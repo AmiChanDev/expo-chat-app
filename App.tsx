@@ -25,7 +25,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { ThemeProvider } from "./src/theme/themeProvider";
 import { UserRegistrationProvider } from "./src/components/UserContext";
 import { AlertNotificationRoot } from "react-native-alert-notification";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
 import { WebSocketProvider } from "./src/socket/WebSocketProvider";
 import { useWebSocketPing } from "./src/socket/useWebSocketPing";
@@ -84,6 +84,14 @@ function AuthBasedWebSocketProvider({ children }: { children: React.ReactNode })
 
   // Convert string userId to number, default to 0 if not available
   const userId = auth?.userId ? parseInt(auth.userId, 10) : 0;
+
+  // Debug logging when auth state changes
+  useEffect(() => {
+    console.log("=== AuthBasedWebSocketProvider Debug ===");
+    console.log("auth.userId:", auth?.userId);
+    console.log("auth.isLoading:", auth?.isLoading);
+    console.log("converted userId:", userId);
+  }, [auth?.userId, auth?.isLoading, userId]);
 
   return (
     <WebSocketProvider userId={userId}>
