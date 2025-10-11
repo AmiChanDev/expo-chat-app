@@ -31,6 +31,31 @@ export default function ChatScreen() {
         options={{
           headerShown: true
         }}
+        listeners={({ navigation }) => ({
+          focus: () => {
+            // Ensure tab bar is shown when HomeScreen is focused
+            navigation.getParent()?.setOptions({
+              tabBarStyle: {
+                display: 'flex',
+                height: 88,
+                backgroundColor: "#ffffff",
+                borderTopWidth: 1,
+                borderTopColor: "#f3f4f6",
+                paddingTop: 8,
+                paddingBottom: 8,
+                paddingHorizontal: 16,
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: -2,
+                },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 8,
+              }
+            });
+          },
+        })}
       />
       <Stack.Screen
         name="SettingScreen"

@@ -104,7 +104,7 @@ export default function SettingScreen() {
     return (
         <SafeAreaView
             className={`flex-1 ${applied === "dark" ? "bg-gray-900" : "bg-gray-50"}`}
-            edges={["left", "right", "top"]}
+            edges={["left", "right"]}
         >
             <StatusBar
                 hidden={false}

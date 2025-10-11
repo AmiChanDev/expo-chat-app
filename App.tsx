@@ -116,7 +116,7 @@ function AppNavigation() {
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: true }} />
         <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
         <Stack.Screen name="SingleChatScreen" component={SingleChatScreen} options={{ headerShown: true }} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: true }} />
         <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="NewChatScreen" component={NewChatScreen} options={{ headerShown: true }} />
         <Stack.Screen name="NewContactScreen" component={NewContactScreen} options={{ headerShown: true }} />

@@ -86,6 +86,49 @@ export const createNewAccount = async (
   }
 };
 
+export const getUserDetails = async (userId: string) => {
+  if (!userId) {
+    console.warn("No user ID provided");
+    return {
+      status: false,
+      message: "User ID is required",
+    };
+  }
+
+  try {
+    const response = await fetch(`${API}/UserController/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      console.log("User details fetched successfully:", json);
+      return {
+        status: true,
+        data: json.user || json.data || json,
+        message: "User details fetched successfully",
+      };
+    } else {
+      const errorText = await response.text();
+      console.log("Failed to fetch user details:", response.status, errorText);
+      return {
+        status: false,
+        message: `Failed to fetch user details: ${response.status}. ${errorText || "Please try again."}`,
+      };
+    }
+  } catch (error) {
+    console.error("Network error while fetching user details:", error);
+    return {
+      status: false,
+      message:
+        "Network error. Please check your internet connection and try again.",
+    };
+  }
+};
+
 export const uploadProfileImage = async (imageUri: string, userId: string) => {
   if (!userId) {
     console.warn("No user ID provided");

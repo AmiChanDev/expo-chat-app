@@ -1,10 +1,25 @@
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../../theme/themeProvider";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function StatusScreen(){
-    return(
-     <SafeAreaView>
-        
-     </SafeAreaView>
+export default function StatusScreen() {
+    const { applied } = useTheme();
+    const isDark = applied === "dark";
+
+    return (
+        <SafeAreaView className={`flex-1 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+            <View className="flex-1 justify-center items-center px-8">
+                <View className={`w-24 h-24 rounded-full ${isDark ? "bg-green-900" : "bg-green-100"} justify-center items-center mb-6`}>
+                    <Ionicons name="radio-button-on" size={48} color="#10b981" />
+                </View>
+                <Text className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-800"} text-center mb-2`}>
+                    Status Updates
+                </Text>
+                <Text className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"} text-center leading-6`}>
+                    Share updates with your contacts and see their status updates here
+                </Text>
+            </View>
+        </SafeAreaView>
     );
-    
 }
