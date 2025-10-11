@@ -148,9 +148,16 @@ public class ChatEndPoint {
                     handleSaveContact(userObject, userId);
                     break;
 
+                case "use_user_profile":
+                    handleGetUserProfile(userId);
+                    break;
+
                 case "ping":
                     handlePingPong(userId);
                     break;
+
+                case "get_user_image":
+                    handleGetUserImage(userId, map);
                 default:
                     System.out.println("Unknown message type: " + type + " from user " + userId);
             }
@@ -159,6 +166,16 @@ public class ChatEndPoint {
             System.out.println("Error processing message from user " + userId + ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void handleGetUserProfile(int userId) {
+        Map<String, Object> envelope = UserService.getMyProfileData(userId);
+        ChatService.sendToUser(userId, envelope);
+    }
+
+    private void handleGetUserImage(int userId, Map map) {
+        LinkedTreeMap userObject = new LinkedTreeMap();
+//        TBD
     }
 
     private void handlePingPong(int userId) {

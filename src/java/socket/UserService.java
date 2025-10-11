@@ -280,49 +280,51 @@ public class UserService {
             session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
-            Criteria c1 = session.createCriteria(User.class);
-            List<User> users = c1.list();
+            // Get only friends from the friend list for this user
+            Criteria c1 = session.createCriteria(FriendList.class);
+            c1.add(Restrictions.eq("userId.id", userId)); // Get friends where current user is the owner
+            c1.add(Restrictions.ne("status", Status.BLOCKED)); // Exclude blocked friends
+            List<FriendList> friendList = c1.list();
 
             Map<String, Object> map = new HashMap();
-            List<UserDTO> UserDTO = new ArrayList<>();
+            List<UserDTO> userDTOList = new ArrayList<>();
 
-            for (User user : users) {
-                Criteria c2 = session.createCriteria(FriendList.class);
-                c2.add(Restrictions.and(
-                        Restrictions.eq("friendId.id", user.getId()), // match by friend's id
-                        Restrictions.eq("userId.id", userId), // correct field name
-                        Restrictions.ne("status", Status.BLOCKED)
-                ));
-                FriendList fl = (FriendList) c2.uniqueResult();
+            for (FriendList fl : friendList) {
+                User friend = fl.getFriendId(); // Get the friend user object
 
                 UserDTO dto = new UserDTO();
-                dto.setId(user.getId());
-                dto.setFirstName(user.getFirstName());
-                dto.setLastName(user.getLastName());
-                dto.setCountryCode(user.getCountryCode());
-                dto.setContactNo(user.getContactNo());
-                dto.setProfileImage(ProfileService.getProfileUrl(userId));
-                dto.setCreatedAt(user.getCreatedAt());
-                dto.setUpdatedAt(user.getUpdatedAt());
-                dto.setStatus(user.getStatus());
+                dto.setId(friend.getId());
+                dto.setFirstName(friend.getFirstName());
+                dto.setLastName(friend.getLastName());
+                dto.setCountryCode(friend.getCountryCode());
+                dto.setContactNo(friend.getContactNo());
 
-                UserDTO.add(dto);
+                // FIXED: Use the friend's ID, not the current user's ID for profile image
+                dto.setProfileImage(ProfileService.getProfileUrl(friend.getId()));
 
-                if (fl != null) {
-                    user.setStatus(Status.ACTIVE);
-                }
+                dto.setCreatedAt(friend.getCreatedAt());
+                dto.setUpdatedAt(friend.getUpdatedAt());
+                dto.setStatus(friend.getStatus());
 
+                userDTOList.add(dto);
             }
 
             map.put("type", "get_all_users");
-            map.put("payload", UserDTO);
+            map.put("payload", userDTOList);
+
+            transaction.commit();
             return map;
+
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            System.out.println("Error in getting all users" + e.getMessage());
+            System.out.println("Error in getting all users: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
         return null;
     }
@@ -354,7 +356,7 @@ public class UserService {
                 FriendList existingFriendship = (FriendList) c2.uniqueResult();
 
                 if (existingFriendship != null) {
-                          responseObject.addProperty("responseStatus", Boolean.FALSE);
+                    responseObject.addProperty("responseStatus", Boolean.FALSE);
                     responseObject.addProperty("message", "This user is already your friend");
                 } else {
                     // Get current user using Criteria
@@ -369,13 +371,13 @@ public class UserService {
                         newFriend.setFriendId(friendUser);
                         // Set display name
                         newFriend.setDisplayName(String.valueOf(userObject.get("displayName")));
-                        
+
                         session.save(newFriend);
 
                         responseObject.addProperty("responseStatus", Boolean.TRUE);
                         responseObject.addProperty("message", "User added as friend");
                     } else {
-                              responseObject.addProperty("responseStatus", Boolean.FALSE);
+                        responseObject.addProperty("responseStatus", Boolean.FALSE);
                         responseObject.addProperty("message", "Current user not found");
                     }
                 }
@@ -401,6 +403,32 @@ public class UserService {
             }
         }
 
+        return null;
+    }
+
+    public static Map<String, Object> getMyProfileData(int userId) {
+        Session session = null;
+        Transaction tx = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+
+            User user = (User) session.get(User.class, userId);
+            UserDTO dto = new UserDTO();
+
+            dto.setFirstName(user.getFirstName());
+            dto.setLastName(user.getLastName());
+            dto.setContactNo(user.getContactNo());
+            dto.setCountryCode(user.getCountryCode());
+            dto.setProfileImage(ProfileService.getProfileUrl(userId));
+
+            session.close();
+            Map<String, Object> map = new HashMap();
+            map.put("type", "user_profile");
+            map.put("payload", dto);
+
+        } catch (Exception e) {
+        }
         return null;
     }
 }

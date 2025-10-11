@@ -29,7 +29,7 @@ public class ChatService {
     // THREAD-SAFE SESSION MANAGEMENT
     private static final ConcurrentHashMap<Integer, Session> SESSIONS = new ConcurrentHashMap<>();
     private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-    public static final String URL = "https://028b2f1a1b3d.ngrok-free.app";
+    public static final String URL = "https://fd1c6cf2b444.ngrok-free.app";
 
     public static void register(int userId, Session session) {
         SESSIONS.put(userId, session);
@@ -45,7 +45,7 @@ public class ChatService {
         Session ws = SESSIONS.get(userId);
         if (ws != null && ws.isOpen()) {
             try {
-                String json = GSON.toJson(payload);
+                String json = GSON.  toJson(payload);
                 ws.getBasicRemote().sendText(json);
             } catch (IOException e) {
                 System.out.println("Error sending message to user " + userId + ": " + e.getMessage());
@@ -57,8 +57,7 @@ public class ChatService {
     }
 
     /**
-     * OPTIMIZED: Gets all users who have chatted with the given user FIXES: The
-     * main issue where only user 5 got chat data
+     * OPTIMIZED: Gets all users who have chatted with the given user 
      */
     public static List<ChatSummary> getFriendChatsForUser(int userId) {
         org.hibernate.Session session = HibernateUtil.getSessionFactory().openSession();
