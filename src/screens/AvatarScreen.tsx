@@ -11,6 +11,7 @@ import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 import { createNewAccount } from "../api/UserService";
 import { AuthContext } from "../socket/authProvider";
+import { FloatingBubblesDesign } from "../components/SplashDesigns";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
@@ -159,74 +160,123 @@ export default function AvatarScreen() {
         <AlertNotificationRoot>
             <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
                 <StatusBar hidden />
+
+                {/* Floating Bubbles Background */}
+                <FloatingBubblesDesign />
+
                 <KeyboardAvoidingView
                     className="flex-1 justify-between"
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     keyboardVerticalOffset={100}
                 >
                     <View className="flex-1 justify-center items-center px-8">
-                        <Text className="text-slate-700 font-bold text-2xl text-center leading-7">
-                            Set Up Your Profile
-                        </Text>
-                        <Text className="text-slate-500 text-sm text-center mt-2 px-4">
-                            Add a profile picture
-                        </Text>
-
-                        {/* Main profile picture */}
-                        <Pressable onPress={pickImage} className="mt-8 mb-6 items-center">
+                        {/* Logo Section */}
+                        <View className="self-center w-36 h-36 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-8">
                             <Image
-                                source={
-                                    image ?
-                                        (typeof image === "string" ? { uri: image } : image)
-                                        : require("../assets/avatar.png")
-                                }
-                                className={`rounded-full border-2 ${image ? "w-44 h-44 border-gray-300" : "w-40 h-40 border-gray-300"}`}
+                                source={require("../assets/logo.png")}
+                                className="w-24 h-24"
+                                resizeMode="contain"
                             />
-                        </Pressable>
+                        </View>
 
-                        {/* Clear selection button */}
-                        {image && (
+                        {/* Header Section */}
+                        <View className="mb-8 items-center">
+                            <Text className="text-slate-700 font-bold text-2xl text-center leading-8 mb-2">
+                                Set Up Your Profile
+                            </Text>
+                            <Text className="text-slate-500 text-base text-center px-4">
+                                Choose a profile picture to personalize your account
+                            </Text>
+                        </View>
+
+                        {/* Main Profile Picture Section */}
+                        <View className="mb-8 items-center">
                             <Pressable
-                                onPress={handleClearSelection}
-                                className="mb-4 px-4 py-2 bg-slate-200 rounded-lg"
+                                onPress={pickImage}
+                                className="relative bg-white rounded-full shadow-lg border-4 border-slate-200 p-2"
                             >
-                                <Text className="text-slate-600 font-medium">Clear Selection</Text>
+                                <Image
+                                    source={
+                                        image ?
+                                            (typeof image === "string" ? { uri: image } : image)
+                                            : require("../assets/avatar.png")
+                                    }
+                                    className="w-32 h-32 rounded-full"
+                                    resizeMode="cover"
+                                />
+                                {/* Camera Icon Overlay */}
+                                <View className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full justify-center items-center shadow-md">
+                                    <Text className="text-white text-lg font-bold">📷</Text>
+                                </View>
                             </Pressable>
-                        )}
 
-                        {/* Avatar selection list - ALWAYS VISIBLE */}
-                        <FlatList
-                            data={avatar}
-                            renderItem={({ item }) => (
+                            {/* Tap to upload text */}
+                            <Text className="text-slate-400 text-sm mt-3">
+                                Tap to upload from gallery
+                            </Text>
+
+                            {/* Clear selection button */}
+                            {image && (
                                 <Pressable
-                                    onPress={() => handleAvatarSelect(item.src)}
-                                    className={`mx-2 p-1 rounded-full ${image === item.src ? 'bg-blue-200 border-2 border-blue-400' : ''
-                                        }`}
+                                    onPress={handleClearSelection}
+                                    className="mt-4 px-6 py-2 bg-slate-200 rounded-lg shadow-sm"
                                 >
-                                    <Image
-                                        source={item.src}
-                                        className="w-20 h-20 rounded-full border-2 border-gray-300"
-                                    />
+                                    <Text className="text-slate-600 font-medium">Clear Selection</Text>
                                 </Pressable>
                             )}
-                            keyExtractor={(item) => item.id}
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ paddingHorizontal: 4 }}
-                        />
+                        </View>
 
-                        <Text className="text-slate-700 font-bold text-xl text-center leading-7 mt-6">
-                            Choose Your Profile Picture
-                        </Text>
-                        <Text className="text-slate-500 text-sm text-center mt-2 px-4">
-                            You can always change it later
-                        </Text>
+                        {/* Divider */}
+                        <View className="w-full mb-6">
+                            <View className="flex-row items-center">
+                                <View className="flex-1 h-px bg-slate-300"></View>
+                                <Text className="text-slate-400 text-sm mx-4 font-medium">or choose an avatar</Text>
+                                <View className="flex-1 h-px bg-slate-300"></View>
+                            </View>
+                        </View>
+
+                        {/* Avatar Selection Section */}
+                        <View className="w-full">
+                            <Text className="text-slate-600 font-semibold text-base mb-4 text-center">
+                                Select from Avatars
+                            </Text>
+
+                            <FlatList
+                                data={avatar}
+                                renderItem={({ item }) => (
+                                    <Pressable
+                                        onPress={() => handleAvatarSelect(item.src)}
+                                        className={`mx-2 rounded-full shadow-sm ${image === item.src
+                                            ? 'bg-blue-100 border-3 border-blue-500 p-1'
+                                            : 'bg-white border-2 border-slate-200 p-1'
+                                            }`}
+                                    >
+                                        <Image
+                                            source={item.src}
+                                            className="w-16 h-16 rounded-full"
+                                            resizeMode="cover"
+                                        />
+                                        {/* Selection indicator */}
+                                        {image === item.src && (
+                                            <View className="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 rounded-full justify-center items-center">
+                                                <Text className="text-white text-xs font-bold">✓</Text>
+                                            </View>
+                                        )}
+                                    </Pressable>
+                                )}
+                                keyExtractor={(item) => item.id}
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
+                                className="bg-white rounded-xl shadow-sm border border-slate-200"
+                            />
+                        </View>
                     </View>
 
-                    {/* Bottom Button */}
+                    {/* Bottom Section */}
                     <View className="px-8 pb-8">
                         <Pressable
-                            className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700"
+                            className="w-full h-14 bg-blue-600 justify-center items-center rounded-xl shadow-lg active:bg-blue-700 mb-4"
                             onPress={handleCreateAccount}
                         >
                             {loading ? (
@@ -235,6 +285,11 @@ export default function AvatarScreen() {
                                 <Text className="text-white font-bold text-lg">Create Account</Text>
                             )}
                         </Pressable>
+
+                        {/* Footer text */}
+                        <Text className="text-slate-400 text-xs text-center px-4">
+                            You can always change your profile picture later in settings
+                        </Text>
                     </View>
                 </KeyboardAvoidingView>
             </SafeAreaView>

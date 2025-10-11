@@ -8,7 +8,7 @@ import Animated, {
     withTiming,
     useAnimatedStyle,
 } from "react-native-reanimated";
-import CircleShape from "../components/CircleShape";
+import { FloatingBubblesDesign } from "../components/SplashDesigns";
 import { useContext, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
@@ -92,10 +92,7 @@ export default function SplashScreen() {
                     />
                 </Animated.View>
 
-                <CircleShape width={300} height={300} borderRadius={150} fillColor="#E0E7FF" top={-150} left={-110} />
-                <CircleShape width={200} height={200} borderRadius={100} fillColor="#C7D2FE" bottom={-100} right={-110} />
-                <CircleShape width={150} height={150} borderRadius={75} fillColor="#A5B4FC" top={50} right={-90} />
-                <CircleShape width={100} height={100} borderRadius={100} fillColor="#818CF8" bottom={50} left={-50} />
+                <FloatingBubblesDesign />
 
                 <View className="absolute bottom-5 w-full items-center">
                     <Text className="text-base font-semibold text-black mb-1">

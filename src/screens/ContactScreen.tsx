@@ -16,6 +16,7 @@ import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { useUserRegistration } from "../components/UserContext";
+import { FloatingBubblesDesign } from "../components/SplashDesigns";
 
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
@@ -43,18 +44,23 @@ export default function ContactScreen() {
         <AlertNotificationRoot>
             <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
                 <StatusBar hidden={true} />
+
+                {/* Floating Bubbles Background */}
+                <FloatingBubblesDesign />
+
                 <KeyboardAvoidingView
                     className="flex-1 justify-between"
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     keyboardVerticalOffset={100}
                 >
                     {/* Header Section */}
+
                     <View className="flex-1 justify-center items-center px-8">
-                        {/* Logo Container */}
-                        <View className="mb-8">
+                        {/* Logo Section */}
+                        <View className="self-center w-36 h-36 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-8">
                             <Image
-                                source={require("../assets/contact.png")}
-                                className="w-32 h-36"
+                                source={require("../assets/logo.png")}
+                                className="w-24 h-24"
                                 resizeMode="contain"
                             />
                         </View>
