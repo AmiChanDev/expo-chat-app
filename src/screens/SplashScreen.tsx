@@ -15,6 +15,7 @@ import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthContext } from "../socket/authProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../theme/themeProvider";
 
 type NavigationProp = NativeStackNavigationProp<
     RootStackParamList,
@@ -24,6 +25,7 @@ type NavigationProp = NativeStackNavigationProp<
 export default function SplashScreen() {
     const navigation = useNavigation<NavigationProp>();
     const auth = useContext(AuthContext);
+    const { applied } = useTheme();
 
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
@@ -66,7 +68,7 @@ export default function SplashScreen() {
 
     const [startTime] = useState(Date.now());
 
-    // Debug function to clear AsyncStorage (uncomment to test fresh registration)
+    // Debug function to clear AsyncStorage
     // useEffect(() => {
     //     const clearStorage = async () => {
     //         await AsyncStorage.clear();
@@ -111,7 +113,7 @@ export default function SplashScreen() {
 
                 <Animated.View style={animatedStyle}>
                     <Image
-                        source={require("../assets/logo.png")}
+                        source={applied === "dark" ? require("../assets/logo_dark.png") : require("../assets/logo.png")}
                         className="w-[220px] h-[220px]"
                         resizeMode="contain"
                     />

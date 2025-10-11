@@ -12,11 +12,13 @@ import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-not
 import { createNewAccount } from "../api/UserService";
 import { AuthContext } from "../socket/authProvider";
 import { FloatingBubblesDesign } from "../components/SplashDesigns";
+import { useTheme } from "../theme/themeProvider";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 
 export default function AvatarScreen() {
     const auth = useContext(AuthContext);
+    const { applied } = useTheme();
 
     const navigation = useNavigation<AvatarScreenProps>();
     const [loading, setLoading] = useState(false);
@@ -59,10 +61,6 @@ export default function AvatarScreen() {
             // Find the selected avatar
             const avatarItem = avatar.find(item => item.src === avatarSrc);
             if (!avatarItem) return;
-
-            // For React Native, we need to convert the require() asset to a usable format
-            // Since we can't easily convert require() assets to blobs in React Native,
-            // we'll use a different approach - copy the asset to a temporary file
 
             // Import Image from react-native to resolve the asset
             const Image = require('react-native').Image;
@@ -217,9 +215,9 @@ export default function AvatarScreen() {
                 >
                     <View className="flex-1 justify-center items-center px-8">
                         {/* Logo Section */}
-                        <View className="self-center w-36 h-36 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-8">
+                        <View className="self-center w-36 h-36 bg-white dark:bg-black rounded-full items-center justify-center shadow-lg mb-8">
                             <Image
-                                source={require("../assets/logo.png")}
+                                source={applied === "dark" ? require("../assets/logo_dark.png") : require("../assets/logo.png")}
                                 className="w-24 h-24"
                                 resizeMode="contain"
                             />

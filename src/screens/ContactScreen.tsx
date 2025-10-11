@@ -17,6 +17,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { useUserRegistration } from "../components/UserContext";
 import { FloatingBubblesDesign } from "../components/SplashDesigns";
+import { useTheme } from "../theme/themeProvider";
 
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
@@ -28,6 +29,7 @@ export default function ContactScreen() {
     const [show, setShow] = useState(false);
     const [countryCode, setCountryCode] = useState<CountryCode>("LK");
     const [country, setCountry] = useState<Country | null>(null);
+    const { applied } = useTheme();
 
     const { userData, setUserData } = useUserRegistration();
 
@@ -57,9 +59,9 @@ export default function ContactScreen() {
 
                     <View className="flex-1 justify-center items-center px-8">
                         {/* Logo Section */}
-                        <View className="self-center w-36 h-36 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-8">
+                        <View className="self-center w-36 h-36 bg-white dark:bg-black rounded-full items-center justify-center shadow-lg mb-8">
                             <Image
-                                source={require("../assets/logo.png")}
+                                source={applied === "dark" ? require("../assets/logo_dark.png") : require("../assets/logo.png")}
                                 className="w-24 h-24"
                                 resizeMode="contain"
                             />

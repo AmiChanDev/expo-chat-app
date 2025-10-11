@@ -11,12 +11,14 @@ import { useUserRegistration } from "../components/UserContext";
 import { FloatingLabelInput } from "react-native-floating-label-input";
 import * as Validation from "../util/Validation";
 import { FloatingBubblesDesign } from "../components/SplashDesigns";
+import { useTheme } from "../theme/themeProvider";
 
 type SignUpScreenProps = NativeStackNavigationProp<RootStackParamList, "SignUpScreen">;
 
 export default function SignUpScreen() {
     const navigation = useNavigation<SignUpScreenProps>();
     const { userData, setUserData } = useUserRegistration();
+    const { applied } = useTheme();
 
     return (
         <AlertNotificationRoot>
@@ -38,9 +40,9 @@ export default function SignUpScreen() {
                         }}>
 
                         {/* Logo Section */}
-                        <View className="self-center w-36 h-36 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-8">
+                        <View className="self-center w-36 h-36 bg-white dark:bg-black rounded-full items-center justify-center shadow-lg mb-8">
                             <Image
-                                source={require("../assets/logo.png")}
+                                source={applied === "dark" ? require("../assets/logo_dark.png") : require("../assets/logo.png")}
                                 className="w-24 h-24"
                                 resizeMode="contain"
                             />

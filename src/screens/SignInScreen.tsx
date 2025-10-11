@@ -19,6 +19,7 @@ import { RootStackParamList } from "../../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../socket/authProvider";
+import { useTheme } from "../theme/themeProvider";
 
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
@@ -28,6 +29,7 @@ type SignInScreenProps = NativeStackNavigationProp<RootStackParamList, "SignInSc
 export default function SignInScreen() {
     const navigation = useNavigation<SignInScreenProps>();
     const auth = useContext(AuthContext);
+    const { applied } = useTheme();
 
     const [show, setShow] = useState(false);
     const [countryCode, setCountryCode] = useState<CountryCode>("LK");
@@ -132,7 +134,7 @@ export default function SignInScreen() {
                             <View className="mb-8 items-center">
                                 <View className="w-24 h-24 bg-white dark:bg-gray-800 rounded-full items-center justify-center shadow-lg mb-4">
                                     <Image
-                                        source={require("../assets/logo.png")}
+                                        source={applied === "dark" ? require("../assets/logo_dark.png") : require("../assets/logo.png")}
                                         className="w-16 h-16"
                                         resizeMode="contain"
                                     />
