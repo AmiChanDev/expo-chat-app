@@ -52,15 +52,46 @@ export default function AvatarScreen() {
         }
     };
 
-    const handleAvatarSelect = (avatarSrc: number) => {
+    const handleAvatarSelect = async (avatarSrc: number) => {
         setImage(avatarSrc);
-        // Find the avatar ID from the source
-        const avatarItem = avatar.find(item => item.src === avatarSrc);
-        const avatarId = avatarItem ? `avatar_${avatarItem.id}` : 'avatar_1';
-        setUserData((previous) => ({
-            ...previous,
-            profileImage: avatarId
-        }));
+
+        try {
+            // Find the selected avatar
+            const avatarItem = avatar.find(item => item.src === avatarSrc);
+            if (!avatarItem) return;
+
+            // For React Native, we need to convert the require() asset to a usable format
+            // Since we can't easily convert require() assets to blobs in React Native,
+            // we'll use a different approach - copy the asset to a temporary file
+
+            // Import Image from react-native to resolve the asset
+            const Image = require('react-native').Image;
+            const resolvedAsset = Image.resolveAssetSource(avatarSrc);
+
+            if (resolvedAsset && resolvedAsset.uri) {
+                // Store the resolved URI - this will be treated like a custom uploaded image
+                setUserData((previous) => ({
+                    ...previous,
+                    profileImage: resolvedAsset.uri
+                }));
+                console.log("Avatar stored as URI:", resolvedAsset.uri);
+            } else {
+                // Fallback: store avatar ID
+                const avatarId = `avatar_${avatarItem.id}`;
+                setUserData((previous) => ({
+                    ...previous,
+                    profileImage: avatarId
+                }));
+                console.log("Avatar stored as ID:", avatarId);
+            }
+        } catch (error) {
+            console.log("Error processing avatar:", error);
+            // Fallback: store the avatar source directly
+            setUserData((previous) => ({
+                ...previous,
+                profileImage: avatarSrc.toString()
+            }));
+        }
     };
 
     const handleClearSelection = () => {
@@ -117,21 +148,27 @@ export default function AvatarScreen() {
             setLoading(true);
             console.log("=== Creating Account Debug Info ===");
             console.log("User Data:", JSON.stringify(userData, null, 2));
-            console.log("Selected Image:", image);
+            console.log("Selected Image (local state):", image);
+            console.log("Profile Image in userData:", userData.profileImage);
             console.log("API URL:", process.env.EXPO_PUBLIC_APP_URL + "/ChatApp");
 
             const response = await createNewAccount(userData);
             console.log("=== API Response ===");
             console.log(JSON.stringify(response, null, 2));
 
-            if (response && response.status) {
+            if (response && ((response as any).status === true || (response as any).success === true)) {
                 Toast.show({
                     type: ALERT_TYPE.SUCCESS,
                     title: "Success",
-                    textBody: response.message
+                    textBody: (response as any).message || "Account created successfully!"
                 })
                 if (auth) {
-                    await auth.signUp(response.data.userId.toString());
+                    // Try different possible user ID fields safely
+                    const responseAny = response as any;
+                    const userId = responseAny.data?.userId || responseAny.userId || responseAny.id;
+                    if (userId) {
+                        await auth.signUp(userId.toString());
+                    }
                 }
                 console.log("Profile setup completed");
                 navigation.replace("HomeTabs")
@@ -139,9 +176,9 @@ export default function AvatarScreen() {
                 Toast.show({
                     type: ALERT_TYPE.WARNING,
                     title: "Warning",
-                    textBody: response.message
+                    textBody: (response as any)?.message || "Account creation failed"
                 })
-                console.log("Profile setup failed:", response.message);
+                console.log("Profile setup failed:", (response as any)?.message);
             }
 
         } catch (error) {
@@ -214,6 +251,13 @@ export default function AvatarScreen() {
                             <Text className="text-slate-400 text-sm mt-3">
                                 Tap to upload from gallery
                             </Text>
+
+                            {/* Selection status text */}
+                            {image && (
+                                <Text className="text-blue-600 text-xs mt-1 font-medium">
+                                    {typeof image === "string" ? "📱 Custom photo selected" : "🎭 Avatar selected"}
+                                </Text>
+                            )}
 
                             {/* Clear selection button */}
                             {image && (

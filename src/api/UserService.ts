@@ -25,21 +25,22 @@ export const createNewAccount = async (
   formData.append("countryCode", UserRegistrationData.countryCode);
   formData.append("contactNo", UserRegistrationData.contactNo);
 
-  // Handle profile image - check if it's a custom image (URI) or avatar (ID)
+  // Handle profile image - treat all images (custom or avatar) as file uploads
   if (UserRegistrationData.profileImage) {
     if (
       UserRegistrationData.profileImage.startsWith("file://") ||
       UserRegistrationData.profileImage.startsWith("http") ||
-      UserRegistrationData.profileImage.startsWith("content://")
+      UserRegistrationData.profileImage.startsWith("content://") ||
+      UserRegistrationData.profileImage.startsWith("asset://")
     ) {
-      // Custom image selected
+      // Image file (custom upload or resolved avatar)
       formData.append("profileImage", {
         uri: UserRegistrationData.profileImage,
         name: "profile.jpg",
         type: "image/jpeg",
       } as any);
     } else {
-      // Avatar selected (avatar_1, avatar_2, etc.)
+      // Fallback: if it's still an avatar ID, send it as avatarId
       formData.append("avatarId", UserRegistrationData.profileImage);
     }
   }
@@ -53,7 +54,18 @@ export const createNewAccount = async (
     if (response.ok) {
       const json = await response.json();
       console.log("Success response:", json);
-      return json;
+
+      // Normalize the response format to ensure it has the expected structure
+      const normalizedResponse = {
+        status: json.status !== undefined ? json.status : true,
+        success: json.success !== undefined ? json.success : true,
+        message: json.message || "Account created successfully",
+        data: json.data || json,
+        userId: json.userId || json.data?.userId || json.id,
+      };
+
+      console.log("Normalized response:", normalizedResponse);
+      return normalizedResponse;
     } else {
       const errorText = await response.text();
       console.log("API Error:", response.status, errorText);
