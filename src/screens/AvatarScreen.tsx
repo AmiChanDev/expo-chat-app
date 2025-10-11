@@ -10,7 +10,7 @@ import { useUserRegistration } from "../components/UserContext";
 import * as Validation from "../util/Validation";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 import { createNewAccount } from "../api/UserService";
-import { AuthContext } from "./serviceScreens/authProvider";
+import { AuthContext } from "../socket/authProvider";
 
 type AvatarScreenProps = NativeStackNavigationProp<RootStackParamList, "ContactScreen">;
 

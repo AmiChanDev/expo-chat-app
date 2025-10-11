@@ -1,16 +1,19 @@
 import { StatusBar } from "expo-status-bar";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeOption, useTheme } from "../../theme/themeProvider";
+import { AuthContext } from "../../socket/authProvider";
+import { CommonActions } from "@react-navigation/native";
 
 const options: ThemeOption[] = ["light", "dark", "system"];
 
 export default function SettingScreen() {
     const { preference, applied, setPreference } = useTheme();
     const navigation = useNavigation();
+    const auth = useContext(AuthContext);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -41,6 +44,35 @@ export default function SettingScreen() {
 
     const handleThemeChange = async (themeOption: ThemeOption) => {
         await setPreference(themeOption);
+    };
+
+    const handleLogout = () => {
+        Alert.alert(
+            "Logout",
+            "Are you sure you want to logout?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "Logout",
+                    style: "destructive",
+                    onPress: async () => {
+                        if (auth) {
+                            await auth.signOut();
+                            // Reset navigation to SplashScreen
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 0,
+                                    routes: [{ name: 'SplashScreen' }],
+                                })
+                            );
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const getThemeIcon = (option: ThemeOption) => {
@@ -172,7 +204,7 @@ export default function SettingScreen() {
                 </View>
 
                 {/* Additional Settings Section */}
-                <View className={`${applied === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm border ${applied === "dark" ? "border-gray-700" : "border-gray-100"}`}>
+                <View className={`${applied === "dark" ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm border ${applied === "dark" ? "border-gray-700" : "border-gray-100"} mb-6`}>
                     <View className="flex-row items-center mb-4">
                         <View className={`w-10 h-10 rounded-full ${applied === "dark" ? "bg-gray-700" : "bg-gray-100"} justify-center items-center mr-3`}>
                             <Ionicons
@@ -183,20 +215,46 @@ export default function SettingScreen() {
                         </View>
                         <View className="flex-1">
                             <Text className={`text-lg font-semibold ${applied === "dark" ? "text-white" : "text-gray-800"}`}>
-                                Other Settings
+                                Account Settings
                             </Text>
                             <Text className={`text-sm ${applied === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                                Additional app preferences
+                                Manage your account
                             </Text>
                         </View>
                     </View>
 
-                    {/* Placeholder for future settings */}
-                    {/* <View className={`p-4 rounded-xl ${applied === "dark" ? "bg-gray-700/50" : "bg-gray-50"}`}>
-                        <Text className={`text-center ${applied === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                            More settings coming soon...
-                        </Text>
-                    </View> */}
+                    {/* Logout Button */}
+                    <TouchableOpacity
+                        className={`flex-row items-center p-4 rounded-xl border-2 ${applied === "dark"
+                            ? "bg-red-600/20 border-red-500"
+                            : "bg-red-50 border-red-300"
+                            }`}
+                        activeOpacity={0.7}
+                        onPress={handleLogout}
+                    >
+                        <View className={`w-12 h-12 rounded-full justify-center items-center mr-4 ${applied === "dark" ? "bg-red-600" : "bg-red-500"}`}>
+                            <Ionicons
+                                name="log-out-outline"
+                                size={24}
+                                color="white"
+                            />
+                        </View>
+
+                        <View className="flex-1">
+                            <Text className={`text-base font-semibold mb-1 ${applied === "dark" ? "text-red-400" : "text-red-600"}`}>
+                                Logout
+                            </Text>
+                            <Text className={`text-sm ${applied === "dark" ? "text-red-300" : "text-red-500"}`}>
+                                Sign out of your account
+                            </Text>
+                        </View>
+
+                        <Ionicons
+                            name="chevron-forward"
+                            size={20}
+                            color={applied === "dark" ? "#ef4444" : "#dc2626"}
+                        />
+                    </TouchableOpacity>
                 </View>
 
                 {/* Current Theme Info */}

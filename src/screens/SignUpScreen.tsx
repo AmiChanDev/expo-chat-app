@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { View, Text, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from "react-native";
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from "react-native-alert-notification";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,8 +18,6 @@ export default function SignUpScreen() {
     const navigation = useNavigation<SignUpScreenProps>();
 
     const { userData, setUserData } = useUserRegistration();
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
 
 
     return (
@@ -82,7 +80,7 @@ export default function SignUpScreen() {
                                             autoClose: 2000,
                                         })
                                     } else {
-                                        navigation.replace  ("ContactScreen");
+                                        navigation.replace("ContactScreen");
                                     }
 
                                 }}

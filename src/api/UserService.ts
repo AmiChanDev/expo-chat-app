@@ -1,17 +1,16 @@
-import { useContext } from "react";
 import { UserRegistrationData } from "../components/UserContext";
-import { AuthContext } from "../socket/authProvider";
 
-const API = process.env.EXPO_PUBLIC_APP_URL + "/ChatApp";
+const API_BASE = process.env.EXPO_PUBLIC_APP_URL || "http://localhost:8080";
+const API = API_BASE + "/ChatApp";
 
 export const createNewAccount = async (
   UserRegistrationData: UserRegistrationData
 ) => {
-  console.log("API URL:", process.env.EXPO_PUBLIC_APP_URL + "/ChatApp");
+  console.log("API URL:", API_BASE + "/ChatApp");
   console.log("User Data:", UserRegistrationData);
 
   // Check if API URL is configured
-  if (!API) {
+  if (!API_BASE) {
     console.error("EXPO_PUBLIC_APP_URL is not configured");
     return {
       status: false,
@@ -73,11 +72,9 @@ export const createNewAccount = async (
   }
 };
 
-export const uploadProfileImage = async (imageUri: string) => {
-  const auth = useContext(AuthContext);
-
-  if (!auth || !auth.userId) {
-    console.warn("No authenticated user found");
+export const uploadProfileImage = async (imageUri: string, userId: string) => {
+  if (!userId) {
+    console.warn("No user ID provided");
     return {
       status: false,
       message: "User not authenticated",
@@ -85,7 +82,7 @@ export const uploadProfileImage = async (imageUri: string) => {
   }
 
   const formData = new FormData();
-  formData.append("userId", auth.userId);
+  formData.append("userId", userId);
   formData.append("profileImage", {
     uri: imageUri,
     name: "profile.jpg",
